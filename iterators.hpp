@@ -27,26 +27,45 @@ namespace ft
 			typedef Category		iterator_category;
 	};
 
-	// *** ITERATOR TAGS ***
-	// Empty classes definitions that serve as identifiers for iterators
-	// that can provide particular operations.
+	// *** ITERATOR TRAITS ***
+	// Empty classes definitions that serve as identifiers for categories
+	// of iterators that can provide particular operations.
 	// From least to most powerful :
-	class input_iterator_tag {}; // read + increment (single pass)
-	class forward_iterator_tag {}; // + increment (multiple passes)
-	class bidirectional_iterator_tag {}; // + decrement
-	class random_access_iterator_tag {}; // + random access
-	// nb : iterators that fall in the above categories and also meet them
+	class Input_iterator_tag {};			// read + increment (single pass)
+	class Forward_iterator_tag {};			// + increment (multiple passes)
+	class Bidirectional_iterator_tag {};	// + decrement
+	class Random_access_iterator_tag {};	// + random access
+	// nb : iterators that fall in the above categories and also meet the
 	// below requirements are called mutable iterators :
-	class output_iterator_tag {}; // write + increment (single pass)
+	class Output_iterator_tag {};			// write + increment (single pass)
 	// todo : implement iterator derivated classes
 
 	template <class T>
-	class List_iterator
+	class Bidirectional_iterator :
+	public ft::Iterator<ft::Bidirectional_iterator_tag, T>
 	{
+		public: //qualifying inherited types...
+			using typename ft::Iterator<ft::Bidirectional_iterator_tag, T>::
+																value_type;
+			using typename ft::Iterator<ft::Bidirectional_iterator_tag, T>::
+															difference_type;
+			using typename ft::Iterator<ft::Bidirectional_iterator_tag, T>::
+																	pointer;
+			using typename ft::Iterator<ft::Bidirectional_iterator_tag, T>::
+																	reference;
+			using typename ft::Iterator<ft::Bidirectional_iterator_tag, T>::
+															iterator_category;
+		private:
+			pointer _elem;
 	};
 
 	template <class T>
 	class Reverse_iterator
+	{
+	};
+
+	template <class T>
+	class List_iterator
 	{
 	};
 } // namespace ft
