@@ -7,8 +7,8 @@ namespace ft
 {
 	// *** ITERATOR BASE CLASS ***
 	// Base template class that will be used to derive iterator classes.
-	// Defines types that are used in the iterator_traits template class
-	// to generate the appropriate instantiation automatically.
+	// Only contains type definitions that will be used in the iterator_traits
+	// template to generate the appropriate instantiation automatically.
 	template
 	<
 		class Category, // will hold an iterator tag
@@ -27,7 +27,7 @@ namespace ft
 			typedef Category		iterator_category;
 	};
 
-	// *** ITERATOR TRAITS ***
+	// *** ITERATOR TAGS ***
 	// Empty classes definitions that serve as identifiers for categories
 	// of iterators that can provide particular operations.
 	// From least to most powerful :
@@ -41,10 +41,15 @@ namespace ft
 	// todo : implement iterator derivated classes
 
 	template <class T>
-	class Bidirectional_iterator :
-	public ft::Iterator<ft::Bidirectional_iterator_tag, T>
+	class Reverse_iterator
 	{
-		public: //qualifying inherited types...
+	};
+
+	template <class T>
+	class List_iterator :
+		public ft::Iterator<ft::Bidirectional_iterator_tag, T>
+	{
+		public:
 			using typename ft::Iterator<ft::Bidirectional_iterator_tag, T>::
 																value_type;
 			using typename ft::Iterator<ft::Bidirectional_iterator_tag, T>::
@@ -55,18 +60,6 @@ namespace ft
 																	reference;
 			using typename ft::Iterator<ft::Bidirectional_iterator_tag, T>::
 															iterator_category;
-		private:
-			pointer _elem;
-	};
-
-	template <class T>
-	class Reverse_iterator
-	{
-	};
-
-	template <class T>
-	class List_iterator
-	{
 	};
 } // namespace ft
 
