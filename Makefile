@@ -4,7 +4,7 @@ VALNAME = $(addprefix val_,$(NAME))
 
 VPATH =.:.
 
-FLAGS = -Wall -Wextra
+FLAGS = -Wall -Wextra -std=c++98
 ASANFLAGS = -Wall -Wextra \
 			-Wformat-security -Werror=format-security -Werror=array-bounds -g \
 			-fsanitize=address

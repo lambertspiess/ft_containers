@@ -26,16 +26,6 @@ namespace ft
 	};
 
 //============================================================================
-	// ========== Iterator_tags ==========
-	// Empty classes definitions to serve as identifier as to what
-	// set of operations an iterator is capable of.
-	// From least to most powerful :
-	class Input_iterator_tag {};			// read + increment (single pass)
-	class Forward_iterator_tag {};			// + increment (multiple passes)
-	class Bidirectional_iterator_tag {};	// + decrement
-	class Random_access_iterator_tag {};	// + random access
-	class Output_iterator_tag {};			// write + increment (single pass)
-
 	// ========== Iterator_traits ==========
 	// provides uniform interface to the properties of LegacyIterator types.
 	// This makes possible to implement algorithms only in terms of iterators. 
@@ -73,7 +63,22 @@ namespace ft
 			typedef Random_access_iterator_tag	iterator_category;
 	};
 
+	// ========== Iterator_tags ==========
+	// Empty classes definitions to serve as identifier as to what
+	// set of operations an iterator is capable of.
+	// From least to most powerful :
+	struct Input_iterator_tag {};			// read + increment (single pass)
+	struct Forward_iterator_tag {};			// + increment (multiple passes)
+	struct Bidirectional_iterator_tag {};	// + decrement
+	struct Random_access_iterator_tag {};	// + random access
+	struct Output_iterator_tag {};			// write + increment (single pass)
+
 //============================================================================
 
+	// ========== list iterator ==========
+	// 
+
+
+}
 
 #endif //ITERATORS_HPP

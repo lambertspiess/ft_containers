@@ -6,29 +6,17 @@
 
 namespace ft
 {
-//	template <typename T, class Allocator = std::allocator<T> >
-//	class List
-//	{
-//		public:
-//			// types
-//			typedef T						value_type;
-//			typedef Allocator				allocator_type;
-//			typedef typename std::allocator_traits<Allocator>::pointer
-//											pointer;
-//			typedef typename std::allocator_traits<Allocator>::const_pointer
-//											const_pointer;
-//			typedef T &						reference;
-//			typedef const T &				const_reference;
-//			typedef typename std::size_t	size_type;
-//			typedef typename std::ptrdiff_t	difference_type;
-//			typedef typename ft::List_iterator<T>	iterator;
-//			typedef const iterator			const_iterator;
-//			typedef typename ft::Reverse_iterator<T>	reverse_iterator;
-//			typedef const reverse_iterator	const_reverse_iterator;
-
-			// construct/copy/destroy
-			// ...
-	};
+	template <class T, class Alloc = std::allocator<T> >
+	class List
+	{
+		public:
+			typedef T											value_type;
+			typedef Alloc										allocator_type;
+			typedef typename Alloc::reference			reference;
+			typedef typename Alloc::const_reference	const_reference;
+			typedef typename Alloc::pointer			pointer;
+			typedef typename Alloc::const_pointer		const_pointer;
+			// Alloc
+	}
 }
-
 #endif //LIST_HPP
