@@ -13,7 +13,9 @@ VALFLAGS = -Wall -Wextra -ggdb3
 SRCS += main.cpp
 
 INCLUDES += includes.hpp
-INCLUDES += Iterators.hpp
+INCLUDES += utils.hpp
+INCLUDES += iterator_base_types.hpp
+INCLUDES += iterator_base_funcs.hpp
 
 OBJSPATH = objs
 SANOBJSPATH = sanobjs
