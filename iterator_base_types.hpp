@@ -1,5 +1,5 @@
-#ifndef ITERATOR_BASE_UTILS_HPP
-# define ITERATOR_BASE_UTILS_HPP
+#ifndef ITERATOR_BASE_TYPES_HPP
+# define ITERATOR_BASE_TYPES_HPP
 
 # include <cstddef>
 
@@ -28,23 +28,23 @@ namespace ft
 	/*
 	 * templates to check the tag of an iterator
 	 */
-	template <bool Condition, typename T>
-	struct tag_is
-	{
-		typedef T type;
-		const static bool vaa// lala
-	}
+//	template <bool Condition, typename T>
+//	struct tag_is
+//	{
+//		typedef T type;
+//		const static bool vaa// lala type checking goes in template param declaration (see line 125)
+//	}
 
-	template <typename T>
-	struct has_input_iterator_tag : public
+//	template <typename T>
+//	struct has_input_iterator_tag : public
 
 	/*
 	 * iterator :
 	 * Provides nested typedefs that iterator classes will inherit.
 	 * They will be used in template specialisation and overloading.
 	 */
-	template<typename _Category, typename _Tp, typename _Distance = ptrdiff_t,
-			typename _Pointer = _Tp*, typename _Reference = _Tp&>
+	template <typename _Category, typename _Tp, typename _Distance = ptrdiff_t,
+				typename _Pointer = _Tp*, typename _Reference = _Tp&>
 	struct iterator
 	{
 		// holds an X_iterator_tag
@@ -98,36 +98,6 @@ namespace ft
 		return typename iterator_traits<_Iter>::iterator_category();
 	}
 
-
-	/*
-	 * ========== ENABLE_IF ========== 
-	 * This is a SFINAE-based constraint. Blocks compilation of templates
-	 * if the parameterized type doesn't fulfill the condition B.
-	 * This is achieved by not declaring the typedef T type when the 
-	 * condition isn't met. Used notably when instantiating Iterators.
-	 */
-
-	template<bool B, class T = void>
-	struct enable_if
-	{};
-	template<class T>
-	struct enable_if<true, T>
-	{ typedef T type; };
-
-	/*
-	 * ========== TYPE CHECKING ========== 
-	 * Templates used in conjunction with enable_if to do compile-time
-	 * type-checking
-	 */
-
-	/*
-	 * is_integral : Checks whether T is an integral type. This is achieved by
-	 * setting the static member constant value to true if T is integral,
-	 * false otherwise.
-	 */
-	template <bool is_integral, typename T>
-	struct is_integral_
-
 } // namespace ft
 
-#endif // ITERATOR_BASE_FUNC_HPP
+#endif // ITERATOR_BASE_TYPES_HPP
