@@ -111,7 +111,7 @@ namespace ft {
 	}
 
 	template<typename RandomAccessIterator>
-	typename ft::iterator_traits<_RandomAccessIterator>::difference_type
+	typename ft::iterator_traits<RandomAccessIterator>::difference_type
 		distance(RandomAccessIterator first, RandomAccessIterator last,
 					random_access_iterator_tag)
 	{
@@ -124,70 +124,6 @@ namespace ft {
 	{
 		return ft::distance(first, last, ft::iterator_category(first));
 	}
-
-  template<typename InputIterator, typename Distance>
-    void advance(InputIterator& i, _Distance __n, input_iterator_tag)
-    {
-      // concept requirements
-      __glibcxx_function_requires(_InputIteratorConcept<_InputIterator>)
-      __glibcxx_assert(__n >= 0);
-      while (__n--)
-	++__i;
-    }
-
-  template<typename _BidirectionalIterator, typename _Distance>
-    inline _GLIBCXX14_CONSTEXPR void
-    __advance(_BidirectionalIterator& __i, _Distance __n,
-	      bidirectional_iterator_tag)
-    {
-      // concept requirements
-      __glibcxx_function_requires(_BidirectionalIteratorConcept<
-				  _BidirectionalIterator>)
-      if (__n > 0)
-        while (__n--)
-	  ++__i;
-      else
-        while (__n++)
-	  --__i;
-    }
-
-  template<typename _RandomAccessIterator, typename _Distance>
-    inline _GLIBCXX14_CONSTEXPR void
-    __advance(_RandomAccessIterator& __i, _Distance __n,
-              random_access_iterator_tag)
-    {
-      // concept requirements
-      __glibcxx_function_requires(_RandomAccessIteratorConcept<
-				  _RandomAccessIterator>)
-      if (__builtin_constant_p(__n) && __n == 1)
-	++__i;
-      else if (__builtin_constant_p(__n) && __n == -1)
-	--__i;
-      else
-	__i += __n;
-    }
-
-  /**
-   *  @brief A generalization of pointer arithmetic.
-   *  @param  __i  An input iterator.
-   *  @param  __n  The @a delta by which to change @p __i.
-   *  @return  Nothing.
-   *
-   *  This increments @p i by @p n.  For bidirectional and random access
-   *  iterators, @p __n may be negative, in which case @p __i is decremented.
-   *
-   *  For random access iterators, this uses their @c + and @c - operations
-   *  and are constant time.  For other %iterator classes they are linear time.
-  */
-  template<typename _InputIterator, typename _Distance>
-    inline _GLIBCXX17_CONSTEXPR void
-    advance(_InputIterator& __i, _Distance __n)
-    {
-      // concept requirements -- taken care of in __advance
-      typename iterator_traits<_InputIterator>::difference_type __d = __n;
-      std::__advance(__i, __d, std::__iterator_category(__i));
-    }
-
 }
 
 #endif // SHARED_UTILS_HPP
