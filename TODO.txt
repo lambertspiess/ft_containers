@@ -1,1 +1,0 @@
-READ on inline functions, metaprogramming

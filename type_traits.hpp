@@ -4,10 +4,290 @@
 # include <cstddef>
 # include <typeinfo>
 # include <limits>
-# include "cpp_type_traits.hpp"
 
 namespace ft
 {
+ // ===================== BITS CPP TYPE TRAITS ===================== 
+
+	struct true_type { };
+	struct false_type { };
+
+	template<bool>
+    struct truth_type
+    { typedef false_type type; };
+
+	template<>
+    struct truth_type<true>
+    { typedef true_type type; };
+
+	template<class Sp, class Tp>
+    struct traitor
+    {
+      enum { value = bool(Sp::value) || bool(Tp::value) };
+      typedef typename truth_type<value>::type type;
+    };
+
+  // Compare for equality of types.
+	template<typename, typename>
+	struct are_same
+	{
+		enum { value = 0 };
+		typedef false_type type;
+	};
+
+	template<typename Tp>
+	struct are_same<Tp, Tp>
+	{
+		enum { value = 1 };
+		typedef true_type type;
+	};
+
+	// Holds if the template-argument is a void type.
+	template<typename Tp>
+	struct is_void
+	{
+		enum { value = 0 };
+		typedef false_type type;
+	};
+
+	template<>
+	struct is_void<void>
+	{
+		enum { value = 1 };
+		typedef true_type type;
+	};
+
+//
+// Integer types
+//
+	template<typename Tp>
+	struct is_integer
+	{
+		enum { value = 0 };
+		typedef false_type type;
+	};
+
+// Thirteen specializations (yes there are eleven standard integer
+// types; <em>long long</em> and <em>unsigned long long</em> are
+// supported as extensions).  Up to four target-specific int<N>
+// types are supported as well.
+template<>
+	struct is_integer<bool>
+	{
+		enum { value = 1 };
+		typedef true_type type;
+	};
+
+	template<>
+	struct is_integer<char>
+	{
+		enum { value = 1 };
+		typedef true_type type;
+	};
+
+template<>
+struct is_integer<signed char>
+{
+	enum { value = 1 };
+	typedef true_type type;
+};
+
+template<>
+  struct is_integer<unsigned char>
+  {
+    enum { value = 1 };
+    typedef true_type type;
+  };
+
+  template<>
+    struct is_integer<short>
+    {
+      enum { value = 1 };
+      typedef true_type type;
+    };
+
+  template<>
+    struct is_integer<unsigned short>
+    {
+      enum { value = 1 };
+      typedef true_type type;
+    };
+
+  template<>
+    struct is_integer<int>
+    {
+      enum { value = 1 };
+      typedef true_type type;
+    };
+
+  template<>
+    struct is_integer<unsigned int>
+    {
+      enum { value = 1 };
+      typedef true_type type;
+    };
+
+  template<>
+    struct is_integer<long>
+    {
+      enum { value = 1 };
+      typedef true_type type;
+    };
+
+  template<>
+    struct is_integer<unsigned long>
+    {
+      enum { value = 1 };
+      typedef true_type type;
+    };
+
+  template<>
+    struct is_integer<long long>
+    {
+      enum { value = 1 };
+      typedef true_type type;
+    };
+
+  template<>
+    struct is_integer<unsigned long long>
+    {
+      enum { value = 1 };
+      typedef true_type type;
+    };
+
+  //
+  // Floating point types
+  //
+  template<typename Tp>
+    struct is_floating
+    {
+      enum { value = 0 };
+      typedef false_type type;
+    };
+
+  // three specializations (float, double and 'long double')
+  template<>
+    struct is_floating<float>
+    {
+      enum { value = 1 };
+      typedef true_type type;
+    };
+
+  template<>
+    struct is_floating<double>
+    {
+      enum { value = 1 };
+      typedef true_type type;
+    };
+
+  template<>
+    struct is_floating<long double>
+    {
+      enum { value = 1 };
+      typedef true_type type;
+    };
+
+  //
+  // Pointer types
+  //
+  template<typename Tp>
+    struct is_pointer
+    {
+      enum { value = 0 };
+      typedef false_type type;
+    };
+
+  template<typename Tp>
+    struct is_pointer<Tp*>
+    {
+      enum { value = 1 };
+      typedef true_type type;
+    };
+
+  //
+  // An arithmetic type is an integer type or a floating point type
+  //
+  template<typename Tp>
+    struct is_arithmetic
+    : public traitor<is_integer<Tp>, is_floating<Tp> >
+    { };
+
+  //
+  // A scalar type is an arithmetic type or a pointer type
+  //
+  template<typename Tp>
+    struct is_scalar
+    : public traitor<is_arithmetic<Tp>, is_pointer<Tp> >
+    { };
+
+  //
+  // For use in std::copy and std::find overloads for streambuf iterators.
+  //
+  template<typename Tp>
+    struct is_char
+    {
+      enum { value = 0 };
+      typedef false_type type;
+    };
+
+  template<>
+    struct is_char<char>
+    {
+      enum { value = 1 };
+      typedef true_type type;
+    };
+
+  template<typename Tp>
+    struct is_byte
+    {
+      enum { value = 0 };
+      typedef false_type type;
+    };
+
+  template<>
+    struct is_byte<char>
+    {
+      enum { value = 1 };
+      typedef true_type type;
+    };
+
+  template<>
+    struct is_byte<signed char>
+    {
+      enum { value = 1 };
+      typedef true_type type;
+    };
+
+  template<>
+    struct is_byte<unsigned char>
+    {
+      enum { value = 1 };
+      typedef true_type type;
+    };
+
+  template<typename> struct iterator_traits;
+
+  //
+  // Move iterator type
+  //
+  template<typename Tp>
+    struct is_move_iterator
+    {
+      enum { value = 0 };
+      typedef false_type type;
+    };
+
+  // Fallback implementation of the function in bits/stl_iterator.h used to
+  // remove the move_iterator wrapper.
+  template<typename Iterator>
+    inline Iterator
+    miter_base(Iterator it)
+    { return it; }
+
+
+
+
+ // ===================== EXT TYPE TRAITS ===================== 
 	/*
 	 * ========== ENABLE_IF ==========
 	 * Ensures at compile-time that parameterized types contain certain traits.
@@ -117,18 +397,18 @@ namespace ft
 
 	// For use in string and vstring.
 	template<typename Type>
-	inline bool
-	is_null_pointer(Type* ptr)
+	inline bool is_null_pointer(Type* ptr)
 	{ return ptr == 0; }
 
 	template<typename Type>
-	inline bool
-	is_null_pointer(Type)
+	inline bool is_null_pointer(Type)
 	{ return false; }
 
 	// For complex and cmath
 	template<typename Tp, bool = is_integer<Tp>::value>
 	struct promote
 	{ typedef double type; };
+
+} // namespace ft
 
 #endif // TYPE_TRAITS
