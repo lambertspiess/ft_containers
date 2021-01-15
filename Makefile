@@ -15,8 +15,7 @@ SRCS += main.cpp
 INCLUDES += includes.hpp
 INCLUDES += cpp_type_traits.hpp
 INCLUDES += type_traits.hpp
-INCLUDES += iterator_base_types.hpp
-INCLUDES += iterator_base_funcs.hpp
+INCLUDES += iterators.hpp
 
 OBJSPATH = objs
 SANOBJSPATH = sanobjs
