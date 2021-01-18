@@ -7,19 +7,15 @@
 
 namespace ft
 {
-	// ============= BITS STL LIST =============
 	template <typename T>
 	struct List_node
 	{
-		List_node<T>		*prev;
-		List_node<T>		*next;
-		T					elem;
+		List_node<T> *prev, *next;
+		T elem;
 
-		List_node()
-		: prev(nullptr), next(nullptr) {}
+		List_node() : prev(nullptr), next(nullptr) {}
 
-		List_node(const T & elem)
-		: prev(nullptr), next(nullptr), elem(elem) {}
+		List_node(const T & elem) : prev(nullptr), next(nullptr), elem(elem) {}
 
 		List_node(const T & elem, List_node<T> *prev, List_node<T> *next)
 		: prev(prev), next(next), elem(elem) {}
@@ -27,12 +23,9 @@ namespace ft
 		List_node(List_node<T> *node)
 		: prev(node->prev), next(node->next), elem(node->elem) {}
 
-		List_node<T> & operator=(const List_node<T> & rhs)
-		{
+		List_node<T> & operator=(const List_node<T> & rhs) {
 			if (*this == rhs) { return *this; }
-			this->prev = rhs.prev;
-			this->next = rhs.next;
-			this->elem = rhs.elem;
+			this->prev = rhs.prev; this->next = rhs.next; this->elem = rhs.elem;
 			return *this;
 		}
 	};
@@ -43,7 +36,7 @@ namespace ft
 		typedef List_iterator<T>							self;
 		typedef List_node<T>								*node;
 
-		typedef ft::iterator<ft::bidirectional_iterator_tag, T>		iterator;
+		typedef ft::iterator<ft::bidirectional_iterator_tag, T>	iterator;
 		typedef typename iterator::difference_type			difference_type;
 		typedef typename iterator::iterator_category		iterator_category;
 		typedef typename iterator::value_type				value_type;
@@ -111,6 +104,29 @@ namespace ft
 		friend bool operator==(const self & x, const self & y)
 		{	return (x.node != y.node); }
 	};
+
+	template <typename T, class Alloc = std::allocator<T> >
+	class List
+	{
+		public:
+			typedef T										value_type;
+			typedef typename Alloc::pointer					pointer;
+			typedef typename Alloc::const_pointer			const_pointer;
+			typedef typename Alloc::reference				reference;
+			typedef typename Alloc::const_reference			const_reference;
+
+			typedef typename ft::List_iterator<T>			iterator;
+			typedef typename ft::List_const_iterator<T>		const_iterator;
+			typedef typename ft::reverse_iterator<iterator>	reverse_iterator;
+			typedef typename ft::reverse_iterator<const_iterator>
+														const_reverse_iterator;
+			typedef size_t									size_type;
+			typedef ptrdiff_t								difference_type;
+			typedef Alloc									allocator_type;;
+		protected:
+			typedef List_node<T>							node;
+			//lala
+	}
 
 }; // namespace ft
 
