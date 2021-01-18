@@ -51,7 +51,7 @@ namespace ft
 		typedef typename iterator::reference				reference;
 
 		List_iterator() : node(nullptr) {}
-		List_iterator(List_node<T> *srcnode) { this->node = srcnode; }
+		List_iterator(List_node<T> *srcnode) : node(srcnode) {}
 		List_iterator(List_iterator<T> & other) : node(other.node) {}
 		virtual ~List_iterator() {}
 
@@ -90,7 +90,7 @@ namespace ft
 		typedef const T &									reference;
 
 		List_const_iterator() : node() {}
-		List_const_iterator(List_node<T> *srcnode) { this->node = srcnode; }
+		List_const_iterator(List_node<T> *srcnode) : node(srcnode) {}
 		List_const_iterator(const List_iterator<T> other) : node(other.node) {}
 		virtual ~List_const_iterator() {}
 
