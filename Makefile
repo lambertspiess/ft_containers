@@ -16,6 +16,8 @@ INCLUDES += includes.hpp
 INCLUDES += cpp_type_traits.hpp
 INCLUDES += type_traits.hpp
 INCLUDES += iterators.hpp
+INCLUDES += misc.hpp
+INCLUDES += list.hpp
 
 OBJSPATH = objs
 SANOBJSPATH = sanobjs
