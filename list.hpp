@@ -4,24 +4,23 @@
 # include "type_traits.hpp"
 # include "iterators.hpp"
 # include "misc.hpp"
+# include <memory>
 
 namespace ft
 {
 	template <typename T>
 	struct List_node
 	{
-		List_node<T> *prev, *next;
-		T elem;
+		List_node<T> *prev, *next; T elem;
 
-		List_node() : prev(nullptr), next(nullptr) {}
-
-		List_node(const T & elem) : prev(nullptr), next(nullptr), elem(elem) {}
-
-		List_node(const T & elem, List_node<T> *prev, List_node<T> *next)
-		: prev(prev), next(next), elem(elem) {}
-
+		List_node()
+			: prev(nullptr), next(nullptr) {}
+		List_node(const T & elem) :
+			prev(nullptr), next(nullptr), elem(elem) {}
+		List_node(List_node<T> *prev, List_node<T> *next, const T & elem)
+			: prev(prev), next(next), elem(elem) {}
 		List_node(List_node<T> *node)
-		: prev(node->prev), next(node->next), elem(node->elem) {}
+			: prev(node->prev), next(node->next), elem(node->elem) {}
 
 		List_node<T> & operator=(const List_node<T> & rhs) {
 			if (*this == rhs) { return *this; }
@@ -105,16 +104,16 @@ namespace ft
 		{	return (x.node != y.node); }
 	};
 
-	template <typename T, class Alloc = std::allocator<T> >
+	template <typename T, typename Alloc = std::allocator<T> >
 	class List
 	{
 		public:
-			typedef T										value_type;
+			typedef Alloc									allocator_type;;
 			typedef typename Alloc::pointer					pointer;
 			typedef typename Alloc::const_pointer			const_pointer;
 			typedef typename Alloc::reference				reference;
 			typedef typename Alloc::const_reference			const_reference;
-
+			typedef T										value_type;
 			typedef typename ft::List_iterator<T>			iterator;
 			typedef typename ft::List_const_iterator<T>		const_iterator;
 			typedef typename ft::reverse_iterator<iterator>	reverse_iterator;
@@ -122,11 +121,45 @@ namespace ft
 														const_reverse_iterator;
 			typedef size_t									size_type;
 			typedef ptrdiff_t								difference_type;
-			typedef Alloc									allocator_type;;
 		protected:
 			typedef List_node<T>							node;
-			//lala
-	}
+		private:
+			allocator_type									_alloc;
+			List_node<T>									*_head;
+			size_type										_size;
+
+			// empty container constructor
+			explicit List(const allocator_type & a = allocator_type())
+			: _alloc(a), _size(0)
+			{
+				_head = new List_node<T>(nullptr, nullptr, value_type());
+				_head->prev = _head; _head->next = _head;
+			}
+			// Constructs a container with n elements which are copies of val.
+			explicit List(size_type n, const value_type val = value_type(),
+							const allocator_type & a = allocator_type())
+			: _alloc(a), _size(0)
+			{
+				_head = new List_node<T>(nullptr, nullptr, value_type());
+				_head->prev = _head; _head->next = _head;
+				this->insert(begin(), n, val);
+			}
+			// Constructs a container with elements from the range [first,last)
+			// enable_if checks if InputIterator isn't an integral type
+			// (instead of an iterator type)
+			template <typename InputIterator>
+			List (InputIterator first, InputIterator last,
+				const allocator_type & a = allocator_type(),
+				typename ft::enable_if<!is_integral<InputIterator>::value,
+							InputIterator>::type iter = InputIterator())
+			: _alloc(a), _size(0)
+			{
+				iter = nullptr;
+				_head->prev = _head; _head->next = _head;
+				insert(end(), first, last);
+			}
+
+	}; // class list
 
 }; // namespace ft
 
