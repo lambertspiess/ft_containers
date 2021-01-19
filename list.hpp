@@ -142,15 +142,14 @@ namespace ft
 			{
 				_head = new List_node<T>(nullptr, nullptr, value_type());
 				_head->prev = _head; _head->next = _head;
-				this->insert(begin(), n, val);
+				insert(begin(), n, val);
 			}
-			// Constructs a container with elements from the range [first,last)
-			// enable_if checks if InputIterator isn't an integral type
-			// (instead of an iterator type)
+			// Range ctor.
+			// enable_if idiom makes sure InputIterator isn't an integral type
 			template <typename InputIterator>
 			List (InputIterator first, InputIterator last,
 				const allocator_type & a = allocator_type(),
-				typename ft::enable_if<!is_integral<InputIterator>::value,
+				typename ft::enable_if<!ft::is_integral<InputIterator>::value,
 							InputIterator>::type iter = InputIterator())
 			: _alloc(a), _size(0)
 			{
@@ -158,6 +157,34 @@ namespace ft
 				_head->prev = _head; _head->next = _head;
 				insert(end(), first, last);
 			}
+			// copy ctor
+			List (const List & src)
+			: _alloc(src._alloc), _size(0)
+			{
+				_head = new List_node<T>(nullptr, nullptr, value_type());
+				_head->prev = _head; _head->next = _head;
+				insert(end(), src.begin(), src.end());
+			}
+			// dtor
+			~List() { clear(); delete _head; }
+			// assignement operator
+			List & operator=(const List & rhs)
+			{
+				if (*this == rhs) { return *this; }
+				clear(); insert(begin(), rhs.begin(), rhs.end()); return *this;
+			}
+			// Iterators
+			iterator begin() { return (iterator(_head->next)); }
+			iterator begin() const { return (const_iterator(_head->next)); }
+			iterator end() { return (iterator(_head)); }
+			iterator end() const { return (const_iterator(_head)); }
+			reverse_iterator rbegin() { return (reverse_iterator(_head->next)); }
+			reverse_iterator rbegin() const { return (reverse_iterator(_head->next)); }
+			reverse_iterator rend() { return (reverse_iterator(_head)); }
+			reverse_iterator rend() const { return (reverse_iterator(_head)); }
+
+			// Capacity
+			// LALA
 
 	}; // class list
 
