@@ -5,11 +5,12 @@
 # include "iterators.hpp"
 # include "misc.hpp"
 # include <memory>
+# include <limits>
 
 namespace ft
 {
 	template <typename T>
-	struct List_node
+	struct List_node // a circular doubly-linked list
 	{
 		List_node<T> *prev, *next; T elem;
 
@@ -90,18 +91,18 @@ namespace ft
 			if (*this == rhs) { return *this; }
 			this->node = rhs.node; return *this;
 		}
-		reference operator*() const { return (this->node)->elem; }
-		pointer operator->() const { return &(this->operator*()); }
-		self & operator++() { this->node = this->node->next; return *this; }
-		self & operator++(int)
-		{	self tmp = *this; this->node = this->node->next; return tmp; }
-		self & operator--() { this->node = this->node->prev; return *this; }
-		self & operator--(int)
-		{	self tmp = *this; this->node = this->node->prev; return tmp; }
-		friend bool operator==(const self & x, const self & y)
-		{	return (x.node == y.node); }
-		friend bool operator==(const self & x, const self & y)
-		{	return (x.node != y.node); }
+		reference	operator*() const { return ((this->node)->elem); }
+		pointer	operator->() const { return (&(this->operator*())); }
+		self &	operator++() { this->node = this->node->next; return *this; }
+		self &	operator++(int)
+			{ self tmp = *this; this->node = this->node->next; return tmp; }
+		self &	operator--() { this->node = this->node->prev; return *this; }
+		self &	operator--(int)
+			{ self tmp = *this; this->node = this->node->prev; return tmp; }
+		friend bool	operator==(const self & x, const self & y)
+			{ return (x.node == y.node); }
+		friend bool	operator==(const self & x, const self & y)
+			{ return (x.node != y.node); }
 	};
 
 	template <typename T, typename Alloc = std::allocator<T> >
@@ -184,7 +185,71 @@ namespace ft
 			reverse_iterator rend() const { return (reverse_iterator(_head)); }
 
 			// Capacity
-			// LALA
+			bool empty() const { return (_size == 0 ? true : false); }
+			size_type size() const { return (_size); }
+			size_type max_size() const
+			{ return (static_cast<size_type>(SIZE_MAX / sizeof(List_node<T>))); }
+
+			// Element access
+			reference front() { return (_head->next->elem); }
+			const_reference front() const { return (_head->prev->elem); }
+			reference back() { return (_head->next->elem); }
+			const_reference front() const { return (_head->prev->elem); }
+
+			// clear the container of leftovers elements and reassign
+			template <typename InputIterator>
+			void assign(InputIterator first, InputIterator last,
+					typename ft::enable_if<!is_integral<InputIterator>::value,
+								InputIterator>::type iter = InputIterator())
+				{ iter = nullptr; clear(); insert(end(), first, last); }
+			// same but reassign with n copies of element val
+			void assign(size_type n, const value_type & val)
+				{ clear(); insert(end(), n, val); }
+
+			void push_front(const value_type & val) { insert(begin(), val); }
+			void pop_front(const value_type & val) { remove(begin()); }
+			void push_back(const value_type & val) { insert(begin(), val); }
+			void pop_back(const value_type & val) { remove(begin()); }
+
+			// insert element before position
+			iterator insert(iterator position, const value_type & val)
+				{ insert(position, 1, val); return (--position); }
+			// insert n elements before position
+			iterator insert(iterator position, size_type n, const value_type & val)
+			{
+				if (n > max_size() || n == 0) { return ; }
+				List_node<T> * first, last, cur;
+				first = new List_node<T>(val);
+				first->prev = first; first->next = first; last = first;
+				}
+				for (size_type i = 1; i < n; i++)
+				{
+					cur = new List_node<T>(last, nullptr, val);
+					last->next = cur; last = last->next;
+				}
+				if (_size == 0)
+				{
+					first->prev = last; last->next = first; _head = last;
+				}
+				else
+				{
+					position->prev->next = first;
+					first->prev = position->prev;
+					last->next = position;
+					position->prev = last;
+				}
+				_size += n;
+			}
+			// insert a range of elements before position
+			template <typename InputIterator>
+			void insert(iterator position, InputIterator first, InputIterator last,
+					typename ft::enable_if<
+						!is_integral<InputIterator>::value, InputIterator
+					>::type iter = InputIterator())
+			{ iter = nullptr;
+				//lala
+			}
+
 
 	}; // class list
 
