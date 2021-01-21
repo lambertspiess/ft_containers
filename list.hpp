@@ -124,10 +124,14 @@ namespace ft
 			typedef ptrdiff_t								difference_type;
 		protected:
 			typedef List_node<T>							node;
+			typedef typename Alloc::template
+				rebind<List_node<T> >::other				node_allocator;
+			typedef typename node_allocator::pointer		node_pointer;
 		private:
 			allocator_type									_alloc;
 			List_node<T>									*_head;
 			size_type										_size;
+
 
 			// empty container constructor
 			explicit List(const allocator_type & a = allocator_type())
@@ -266,7 +270,22 @@ namespace ft
 				}
 				_size += n;
 			}
-// keep writing then test
+			// delete an element at position
+			iterator erase(iterator position)
+				{ erase(position.node, position.node->next); }
+			// delete a range of elements [first, last)
+			iterator erase(iterator first, iterator last)
+			{
+				first.node->prev->next = last.node;
+				last.node->prev = first.node->prev;
+				List_node<T> *to_remove = first.node;
+				List_node<T> *next;
+				while (to_remove != last.node)
+				{
+					next = to_remove->next; delete to_remove; to_remove = next;
+					// construct ? destruct ? deallocate ?
+				}
+			}
 
 	}; // class list
 
