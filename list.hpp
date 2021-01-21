@@ -194,7 +194,7 @@ namespace ft
 			reference front() { return (_head->next->elem); }
 			const_reference front() const { return (_head->prev->elem); }
 			reference back() { return (_head->next->elem); }
-			const_reference front() const { return (_head->prev->elem); }
+			const_reference back() const { return (_head->prev->elem); }
 
 			// clear the container of leftovers elements and reassign
 			template <typename InputIterator>
@@ -207,21 +207,17 @@ namespace ft
 				{ clear(); insert(end(), n, val); }
 
 			void push_front(const value_type & val) { insert(begin(), val); }
-			void pop_front(const value_type & val) { remove(begin()); }
+			void pop_front() { remove(begin()); }
 			void push_back(const value_type & val) { insert(begin(), val); }
-			void pop_back(const value_type & val) { remove(begin()); }
+			void pop_back() { remove(begin()); }
 
-			// insert element before position
-			iterator insert(iterator position, const value_type & val)
-				{ insert(position, 1, val); return (--position); }
-			// insert n elements before position
-			iterator insert(iterator position, size_type n, const value_type & val)
+			// insert n copies of element val before position
+			void insert(iterator position, size_type n, const value_type & val)
 			{
 				if (n > max_size() || n == 0) { return ; }
 				List_node<T> * first, last, cur;
 				first = new List_node<T>(val);
 				first->prev = first; first->next = first; last = first;
-				}
 				for (size_type i = 1; i < n; i++)
 				{
 					cur = new List_node<T>(last, nullptr, val);
@@ -240,16 +236,37 @@ namespace ft
 				}
 				_size += n;
 			}
-			// insert a range of elements before position
+			// insert one element before position
+			iterator insert(iterator position, const value_type & val)
+				{ insert(position, 1, val); return (--position); }
+			// insert the range [first, last) of elements before position
 			template <typename InputIterator>
 			void insert(iterator position, InputIterator first, InputIterator last,
 					typename ft::enable_if<
 						!is_integral<InputIterator>::value, InputIterator
 					>::type iter = InputIterator())
 			{ iter = nullptr;
-				//lala
+				if (first == last) { return ; }
+				List_node<T> start, end; InputIterator itr = first;
+				start = new List_node<T>(*itr); end = start;
+				size_type n = 1;
+				while (++itr != last)
+				{
+					end->next = new List_node<T>(*itr);
+					end->next->prev = end; end = end->next; n++;
+				}
+				if (_size == 0)
+					_head = end;
+				else
+				{
+					List_node<T> before, after;
+					after = *position; before = after->prev;
+					before->next = start; start->prev = before;
+					end->next = after; after->prev = end;
+				}
+				_size += n;
 			}
-
+// keep writing then test
 
 	}; // class list
 
