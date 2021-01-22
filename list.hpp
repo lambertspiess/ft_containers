@@ -372,6 +372,19 @@ namespace ft
 				}
 			}
 
+			void merge(list & x)
+			{
+				if (this == &x) { return ; }
+				iterator i, j;
+				i = begin(); j = x.begin();
+				while (i != end())
+				{
+					while (j != x.end())
+					{
+						if (//lala
+					}
+				}
+			}
 
 	}; // class list
 
