@@ -10,20 +10,21 @@
 namespace ft
 {
 	template <typename T>
-	struct List_node // a circular doubly-linked list
+	struct list_node // a circular doubly-linked list
 	{
-		List_node<T> *prev, *next; T elem;
+		list_node<T> *prev, *next; T elem;
 
-		List_node()
+		list_node()
 			: prev(nullptr), next(nullptr) {}
-		List_node(const T & elem) :
+		list_node(const T & elem) :
 			prev(nullptr), next(nullptr), elem(elem) {}
-		List_node(List_node<T> *prev, List_node<T> *next, const T & elem)
+		list_node(list_node<T> *prev, list_node<T> *next, const T & elem)
 			: prev(prev), next(next), elem(elem) {}
-		List_node(List_node<T> *node)
+		list_node(list_node<T> *node)
 			: prev(node->prev), next(node->next), elem(node->elem) {}
 
-		List_node<T> & operator=(const List_node<T> & rhs) {
+		// compares the adresses of the objects
+		list_node<T> & operator=(const list_node<T> & rhs) {
 			if (*this == rhs) { return *this; }
 			this->prev = rhs.prev; this->next = rhs.next; this->elem = rhs.elem;
 			return *this;
@@ -31,10 +32,10 @@ namespace ft
 	};
  
 	template <typename T>
-	struct List_iterator: public ft::iterator<ft::bidirectional_iterator_tag, T>
+	struct list_iterator: public ft::iterator<ft::bidirectional_iterator_tag, T>
 	{
-		typedef List_iterator<T>							self;
-		typedef List_node<T>								*node;
+		typedef list_iterator<T>							self;
+		typedef list_node<T>								*node;
 
 		typedef ft::iterator<ft::bidirectional_iterator_tag, T>	iterator;
 		typedef typename iterator::difference_type			difference_type;
@@ -43,10 +44,10 @@ namespace ft
 		typedef typename iterator::pointer					pointer;;
 		typedef typename iterator::reference				reference;
 
-		List_iterator() : node(nullptr) {}
-		List_iterator(List_node<T> *srcnode) : node(srcnode) {}
-		List_iterator(List_iterator<T> & other) : node(other.node) {}
-		virtual ~List_iterator() {}
+		list_iterator() : node(nullptr) {}
+		list_iterator(list_node<T> *srcnode) : node(srcnode) {}
+		list_iterator(list_iterator<T> & other) : node(other.node) {}
+		virtual ~list_iterator() {}
 
 		self & operator=(const self & rhs) {
 			if (*this == rhs) { return *this; }
@@ -67,13 +68,13 @@ namespace ft
 		{	return (x.node != y.node); }
 	};
 
-	// Same as List_iterator but const
+	// Same as list_iterator but const
 	template <typename T>
-	struct List_const_iterator
+	struct list_const_iterator
 					: public ft::iterator<ft::bidirectional_iterator_tag, T>
 	{
-		typedef List_const_iterator<T>						self;
-		typedef const List_node<T>							node;
+		typedef list_const_iterator<T>						self;
+		typedef const list_node<T>							node;
 
 		typedef ft::iterator<ft::bidirectional_iterator_tag, T>	iterator;
 		typedef typename iterator::difference_type			difference_type;
@@ -82,10 +83,10 @@ namespace ft
 		typedef const T *									pointer;
 		typedef const T &									reference;
 
-		List_const_iterator() : node() {}
-		List_const_iterator(List_node<T> *srcnode) : node(srcnode) {}
-		List_const_iterator(const List_iterator<T> other) : node(other.node) {}
-		virtual ~List_const_iterator() {}
+		list_const_iterator() : node() {}
+		list_const_iterator(list_node<T> *srcnode) : node(srcnode) {}
+		list_const_iterator(const list_iterator<T> other) : node(other.node) {}
+		virtual ~list_const_iterator() {}
 
 		self & operator=(const self & rhs) {
 			if (*this == rhs) { return *this; }
@@ -106,7 +107,7 @@ namespace ft
 	};
 
 	template <typename T, typename Alloc = std::allocator<T> >
-	class List
+	class list
 	{
 		public:
 			typedef Alloc									allocator_type;;
@@ -115,90 +116,129 @@ namespace ft
 			typedef typename Alloc::reference				reference;
 			typedef typename Alloc::const_reference			const_reference;
 			typedef T										value_type;
-			typedef typename ft::List_iterator<T>			iterator;
-			typedef typename ft::List_const_iterator<T>		const_iterator;
+			typedef typename ft::list_iterator<T>			iterator;
+			typedef typename ft::list_const_iterator<T>		const_iterator;
 			typedef typename ft::reverse_iterator<iterator>	reverse_iterator;
 			typedef typename ft::reverse_iterator<const_iterator>
 														const_reverse_iterator;
 			typedef size_t									size_type;
 			typedef ptrdiff_t								difference_type;
 		protected:
-			typedef List_node<T>							node;
-			typedef typename Alloc::template
-				rebind<List_node<T> >::other				node_allocator;
-			typedef typename node_allocator::pointer		node_pointer;
+			typedef list_node<T>							node;
+			typedef typename Alloc::template rebind<list_node<T> >::other
+															_node_allocator;
+			_node_allocator									_node_alloc;
+			typedef typename _node_allocator::pointer		node_pointer;
+
 		private:
+			node											*_last;
 			allocator_type									_alloc;
-			List_node<T>									*_head;
-			size_type										_size;
 
-
-			// empty container constructor
-			explicit List(const allocator_type & a = allocator_type())
-			: _alloc(a), _size(0)
+// see : https://stackoverflow.com/questions/5628059/c-stl-allocator-vs-operator-new
+			node_pointer _allocateNode(const T & elem, node * prev = nullptr,
+														node * next = nullptr)
 			{
-				_head = new List_node<T>(nullptr, nullptr, value_type());
-				_head->prev = _head; _head->next = _head;
+				node * newnode = _node_alloc.allocate(1);
+				_node_alloc.construct(newnode, node(elem));
+				newnode->prev = prev; newnode->next = next; return newnode;
 			}
+			node_pointer _copyNode(const node * src)
+			{
+				node * newnode = _node_alloc.allocate(1);
+				_node_alloc.construct(newnode, list_node<T>(src->elem));
+				newnode->prev = src->prev; newnode->next = src->next; return newnode;
+			}
+			void		_deleteNode(node *node)
+			{
+				node->prev->next = node->next; node->next->prev = node->prev;
+				_node_alloc.destroy(node); _node_alloc.deallocate(node, 1);
+			}
+			void 		_unlinkNode(node *node)
+			{ node->prev->next = node->next; node->next->prev = node->prev; }
+
+		public:
+			// empty container (_last doubly linked to itself)
+			explicit list(const allocator_type & a = allocator_type())
+			: _alloc(a)
+			{
+				_last = _node_alloc.allocate(1);
+				_node_alloc.construct(_last, node());
+				_last->prev = _last; _last->next = _last;
+			}
+
 			// Constructs a container with n elements which are copies of val.
-			explicit List(size_type n, const value_type val = value_type(),
+			explicit list(size_type n, const value_type val = value_type(),
 							const allocator_type & a = allocator_type())
-			: _alloc(a), _size(0)
+			: _alloc(a)
 			{
-				_head = new List_node<T>(nullptr, nullptr, value_type());
-				_head->prev = _head; _head->next = _head;
-				insert(begin(), n, val);
+				_last = _node_alloc.allocate(1);
+				_node_alloc.construct(_last, list_node<T>());
+				_last->prev = _last; _last->next = _last;
+				insert(end(), n, val);
 			}
-			// Range ctor.
+
+			// range ctor.
 			// enable_if idiom makes sure InputIterator isn't an integral type
 			template <typename InputIterator>
-			List (InputIterator first, InputIterator last,
+			list(InputIterator first, InputIterator last,
 				const allocator_type & a = allocator_type(),
 				typename ft::enable_if<!ft::is_integral<InputIterator>::value,
 							InputIterator>::type iter = InputIterator())
-			: _alloc(a), _size(0)
-			{
-				iter = nullptr;
-				_head->prev = _head; _head->next = _head;
+			: _alloc(a)
+			{ iter = nullptr;
+				_last = _node_alloc.allocate(1);
+				_node_alloc.construct(_last, list_node<T>());
+				_last->prev = _last; _last->next = _last;
 				insert(end(), first, last);
 			}
+
 			// copy ctor
-			List (const List & src)
-			: _alloc(src._alloc), _size(0)
+			list (const list & src)
+			: _alloc(src._alloc)
 			{
-				_head = new List_node<T>(nullptr, nullptr, value_type());
-				_head->prev = _head; _head->next = _head;
+				_last = _node_alloc.allocate(1);
+				_node_alloc.construct(_last, list_node<T>());
+				_last->prev = _last; _last->next = _last;
 				insert(end(), src.begin(), src.end());
 			}
-			// dtor
-			~List() { clear(); delete _head; }
-			// assignement operator
-			List & operator=(const List & rhs)
+
+			~list() { clear(); delete _last; }
+
+			list & operator=(const list & rhs)
 			{
 				if (*this == rhs) { return *this; }
 				clear(); insert(begin(), rhs.begin(), rhs.end()); return *this;
 			}
-			// Iterators
-			iterator begin() { return (iterator(_head->next)); }
-			iterator begin() const { return (const_iterator(_head->next)); }
-			iterator end() { return (iterator(_head)); }
-			iterator end() const { return (const_iterator(_head)); }
-			reverse_iterator rbegin() { return (reverse_iterator(_head->next)); }
-			reverse_iterator rbegin() const { return (reverse_iterator(_head->next)); }
-			reverse_iterator rend() { return (reverse_iterator(_head)); }
-			reverse_iterator rend() const { return (reverse_iterator(_head)); }
+
+			// return an iterator to the first element
+			iterator begin() { return (iterator(_last->next)); }
+			iterator begin() const { return (const_iterator(_last->next)); }
+			// return an iterator to the past-the-end element
+			iterator end() { return (iterator(_last)); }
+			iterator end() const { return (const_iterator(_last)); }
+			reverse_iterator rbegin() { return (reverse_iterator(_last->next)); }
+			reverse_iterator rbegin() const { return (reverse_iterator(_last->next)); }
+			reverse_iterator rend() { return (reverse_iterator(_last)); }
+			reverse_iterator rend() const { return (reverse_iterator(_last)); }
 
 			// Capacity
-			bool empty() const { return (_size == 0 ? true : false); }
-			size_type size() const { return (_size); }
+			bool empty() const { return (_last->next == _last ? true : false); }
+
+			size_type size() const
+			{
+				size_type n = 0; node *ptr = begin();
+				while (ptr != _last) { n++; ptr = ptr->next; }
+				return (n);
+			}
+
 			size_type max_size() const
-			{ return (static_cast<size_type>(SIZE_MAX / sizeof(List_node<T>))); }
+			{ return (static_cast<size_type>(SIZE_MAX / sizeof(list_node<T>))); }
 
 			// Element access
-			reference front() { return (_head->next->elem); }
-			const_reference front() const { return (_head->prev->elem); }
-			reference back() { return (_head->next->elem); }
-			const_reference back() const { return (_head->prev->elem); }
+			reference front() { return (_last->next->elem); }
+			const_reference front() const { return (_last->next->elem); }
+			reference back() { return (_last->prev->elem); }
+			const_reference back() const { return (_last->prev->elem); }
 
 			// clear the container of leftovers elements and reassign
 			template <typename InputIterator>
@@ -206,86 +246,132 @@ namespace ft
 					typename ft::enable_if<!is_integral<InputIterator>::value,
 								InputIterator>::type iter = InputIterator())
 				{ iter = nullptr; clear(); insert(end(), first, last); }
+
 			// same but reassign with n copies of element val
 			void assign(size_type n, const value_type & val)
 				{ clear(); insert(end(), n, val); }
 
-			void push_front(const value_type & val) { insert(begin(), val); }
-			void pop_front() { remove(begin()); }
-			void push_back(const value_type & val) { insert(begin(), val); }
-			void pop_back() { remove(begin()); }
+			void push_front(const value_type & val)
+				{ insert(begin(), _allocateNode(val)); }
+
+			void pop_front() { erase(begin()); }
+
+			void push_back(const value_type & val)
+				{ insert(begin(), _allocateNode(val)); }
+
+			void pop_back() { iterator itr(end()); --itr; erase(itr); }
+
+			// insert node before position
+			void insert(iterator position, const value_type & val)
+			{
+				node *newnode = _allocateNode(val); node *before = position.node->prev;
+				before->next = newnode; newnode->prev = before;
+				newnode->next = position.node; position.node->prev = newnode;
+				return (--position);
+			}
 
 			// insert n copies of element val before position
 			void insert(iterator position, size_type n, const value_type & val)
-			{
-				if (n > max_size() || n == 0) { return ; }
-				List_node<T> * first, last, cur;
-				first = new List_node<T>(val);
-				first->prev = first; first->next = first; last = first;
-				for (size_type i = 1; i < n; i++)
-				{
-					cur = new List_node<T>(last, nullptr, val);
-					last->next = cur; last = last->next;
-				}
-				if (_size == 0)
-				{
-					first->prev = last; last->next = first; _head = last;
-				}
-				else
-				{
-					position->prev->next = first;
-					first->prev = position->prev;
-					last->next = position;
-					position->prev = last;
-				}
-				_size += n;
-			}
-			// insert one element before position
-			iterator insert(iterator position, const value_type & val)
-				{ insert(position, 1, val); return (--position); }
-			// insert the range [first, last) of elements before position
+				{ while (n--) { insert(position, val); } }
+
+			// insert [first, last) before position
 			template <typename InputIterator>
 			void insert(iterator position, InputIterator first, InputIterator last,
 					typename ft::enable_if<
 						!is_integral<InputIterator>::value, InputIterator
 					>::type iter = InputIterator())
-			{ iter = nullptr;
-				if (first == last) { return ; }
-				List_node<T> start, end; InputIterator itr = first;
-				start = new List_node<T>(*itr); end = start;
-				size_type n = 1;
-				while (++itr != last)
-				{
-					end->next = new List_node<T>(*itr);
-					end->next->prev = end; end = end->next; n++;
-				}
-				if (_size == 0)
-					_head = end;
-				else
-				{
-					List_node<T> before, after;
-					after = *position; before = after->prev;
-					before->next = start; start->prev = before;
-					end->next = after; after->prev = end;
-				}
-				_size += n;
+			{
+				iter = nullptr;
+				InputIterator itr = first;
+				while (itr != last)
+					{ insert(position++, itr.node->elem); ++itr; }
 			}
-			// delete an element at position
+
+			// delete an element at @position
 			iterator erase(iterator position)
-				{ erase(position.node, position.node->next); }
+			{
+				iterator next(position.node->next);
+				node * node = position.node; _unlinkNode(node);
+				_node_alloc.destroy(node); _node_alloc.deallocate(node, 1);
+				return (next);
+			}
+
 			// delete a range of elements [first, last)
 			iterator erase(iterator first, iterator last)
 			{
-				first.node->prev->next = last.node;
-				last.node->prev = first.node->prev;
-				List_node<T> *to_remove = first.node;
-				List_node<T> *next;
-				while (to_remove != last.node)
+				iterator itr = first; iterator ret = last.node->next;
+				while (itr != last) { erase(itr++); } return (ret);
+			}
+
+			void swap(list & other)
+			{
+				allocator_type swap_allocator_type = other.allocator_type;
+				_node_allocator swap_node_allocator = other._node_allocator;
+				node * swap_last = other._last;
+
+				other.allocator_type = this->allocator_type;
+				other._node_allocator = this->_node_allocator;
+				other._last = this->_last;
+
+				this->allocator_type = swap_allocator_type;
+				this->_node_allocator = swap_node_allocator;
+				this->_last = swap_last;
+			}
+
+			void resize(size_type n, value_type val = value_type())
+			{
+				if (n < size())
 				{
-					next = to_remove->next; delete to_remove; to_remove = next;
-					// construct ? destruct ? deallocate ?
+					size_type diff = size() - n;
+					while (diff--) { pop_back(); }
+				}
+				else
+				{
+					size_type diff = n - size();
+					while (diff--) { push_back(val); }
 				}
 			}
+
+			void clear() { erase(begin(), end()); }
+
+			void splice(iterator position, list & other)
+			{
+				insert(position, other.begin(), other.end()); other.clear();
+			}
+			void splice(iterator position, list & other, iterator itr)
+			{
+				insert(position, *itr); other.erase(itr);
+			}
+			void splice(iterator position, list & other, iterator first, iterator last)
+			{
+				insert(position, first, last); other.erase(first, last);
+			}
+
+			void remove(const value_type & val)
+			{
+				iterator itr = begin();
+				while (itr != end())
+					{ if (*itr == val) { erase(itr); } else { ++itr; } }
+			}
+
+			template <class Predicate>
+			void remove_if(Predicate pred)
+			{
+				iterator itr = begin();
+				while (itr != end())
+					{ if (pred(*itr) == true) { erase(itr); } else { ++itr; } }
+			}
+
+			void unique()
+			{
+				iterator i, j; i = begin(); j = i;
+				while (i != end())
+				{
+					j = i; ++j; while (j != end() && *j == *i) { erase(j); }
+					++i;
+				}
+			}
+
 
 	}; // class list
 
