@@ -1,9 +1,8 @@
 #ifndef LIST_HPP
 # define LIST_HPP
 
-# include "type_traits.hpp"
 # include "iterators.hpp"
-# include "misc.hpp"
+# include "enable_if.hpp"
 # include <memory>
 # include <limits>
 
@@ -35,7 +34,7 @@ namespace ft
 	struct list_iterator: public ft::iterator<ft::bidirectional_iterator_tag, T>
 	{
 		typedef list_iterator<T>							self;
-		typedef list_node<T>								*node;
+		list_node<T>										*node;
 
 		typedef ft::iterator<ft::bidirectional_iterator_tag, T>	iterator;
 		typedef typename iterator::difference_type			difference_type;
@@ -45,26 +44,26 @@ namespace ft
 		typedef typename iterator::reference				reference;
 
 		list_iterator() : node(nullptr) {}
-		list_iterator(list_node<T> *srcnode) : node(srcnode) {}
-		list_iterator(list_iterator<T> & other) : node(other.node) {}
+		list_iterator(list_node<T> * srcnode) : node(srcnode) {}
+		list_iterator(const self & other) : node(other.node) {}
 		virtual ~list_iterator() {}
 
-		self & operator=(const self & rhs) {
+		iterator & operator=(const self & rhs) {
 			if (*this == rhs) { return *this; }
 			this->node = rhs.node; return *this;
 		}
 		reference operator*() const { return (this->node)->elem; }
 		pointer operator->() const { return &(this->operator*()); }
-		self & operator++() { this->node = this->node->next; return *this; }
-		self & operator++(int)
-		{	self tmp = *this; this->node = this->node->next; return tmp; }
-		self & operator--() { this->node = this->node->prev; return *this; }
-		self & operator--(int)
-		{	self tmp = *this; this->node = this->node->prev; return tmp; }
+		iterator & operator++() { this->node = this->node->next; return *this; }
+		iterator & operator++(int)
+		{	iterator tmp(this->node); this->node = this->node->next; return tmp; }
+		iterator & operator--() { this->node = this->node->prev; return *this; }
+		iterator & operator--(int)
+		{	iterator tmp = *this; this->node = this->node->prev; return tmp; }
 		// friend so the operator can access private parts (i.e traits_type)
 		friend bool operator==(const self & x, const self & y)
 		{	return (x.node == y.node); }
-		friend bool operator==(const self & x, const self & y)
+		friend bool operator!=(const self & x, const self & y)
 		{	return (x.node != y.node); }
 	};
 
@@ -73,8 +72,8 @@ namespace ft
 	struct list_const_iterator
 					: public ft::iterator<ft::bidirectional_iterator_tag, T>
 	{
+		const list_node<T>									*node;
 		typedef list_const_iterator<T>						self;
-		typedef const list_node<T>							node;
 
 		typedef ft::iterator<ft::bidirectional_iterator_tag, T>	iterator;
 		typedef typename iterator::difference_type			difference_type;
@@ -102,8 +101,8 @@ namespace ft
 			{ self tmp = *this; this->node = this->node->prev; return tmp; }
 		friend bool	operator==(const self & x, const self & y)
 			{ return (x.node == y.node); }
-		friend bool	operator==(const self & x, const self & y)
-			{ return (x.node != y.node); }
+		friend bool	operator!=(const self & x, const self & y)
+			{ return !(x.node == y.node); }
 	};
 
 	template <typename T, typename Alloc = std::allocator<T> >
@@ -185,7 +184,7 @@ namespace ft
 				typename ft::enable_if<!ft::is_integral<InputIterator>::value,
 							InputIterator>::type iter = InputIterator())
 			: _alloc(a)
-			{ iter = nullptr;
+			{ static_cast<void>(iter);
 				_last = _node_alloc.allocate(1);
 				_node_alloc.construct(_last, list_node<T>());
 				_last->prev = _last; _last->next = _last;
@@ -212,21 +211,21 @@ namespace ft
 
 			// return an iterator to the first element
 			iterator begin() { return (iterator(_last->next)); }
-			iterator begin() const { return (const_iterator(_last->next)); }
+			const_iterator begin() const { return (const_iterator(_last->next)); }
 			// return an iterator to the past-the-end element
 			iterator end() { return (iterator(_last)); }
-			iterator end() const { return (const_iterator(_last)); }
+			const_iterator end() const { return (const_iterator(_last)); }
 			reverse_iterator rbegin() { return (reverse_iterator(_last->next)); }
-			reverse_iterator rbegin() const { return (reverse_iterator(_last->next)); }
+			reverse_iterator rbegin() const { return (const_reverse_iterator(_last->next)); }
 			reverse_iterator rend() { return (reverse_iterator(_last)); }
-			reverse_iterator rend() const { return (reverse_iterator(_last)); }
+			reverse_iterator rend() const { return (const_reverse_iterator(_last)); }
 
 			// Capacity
 			bool empty() const { return (_last->next == _last ? true : false); }
 
 			size_type size() const
 			{
-				size_type n = 0; node *ptr = begin();
+				size_type n = 0; node_pointer ptr = _last->next;
 				while (ptr != _last) { n++; ptr = ptr->next; }
 				return (n);
 			}
@@ -243,28 +242,35 @@ namespace ft
 			// clear the container of leftovers elements and reassign
 			template <typename InputIterator>
 			void assign(InputIterator first, InputIterator last,
-					typename ft::enable_if<!is_integral<InputIterator>::value,
-								InputIterator>::type iter = InputIterator())
-				{ iter = nullptr; clear(); insert(end(), first, last); }
+				typename ft::enable_if<
+								!is_integral<InputIterator>::value,
+								InputIterator
+									>::type iter = InputIterator())
+				{
+					static_cast<void>(iter);
+					insert(end(), first, last);
+				}
 
 			// same but reassign with n copies of element val
 			void assign(size_type n, const value_type & val)
 				{ clear(); insert(end(), n, val); }
 
 			void push_front(const value_type & val)
-				{ insert(begin(), _allocateNode(val)); }
+				{ insert(begin(), val); }
 
 			void pop_front() { erase(begin()); }
 
 			void push_back(const value_type & val)
-				{ insert(begin(), _allocateNode(val)); }
+				{ insert(begin(), val); }
 
 			void pop_back() { iterator itr(end()); --itr; erase(itr); }
 
 			// insert node before position
-			void insert(iterator position, const value_type & val)
+			iterator insert(iterator position, const value_type & val)
 			{
-				node *newnode = _allocateNode(val); node *before = position.node->prev;
+				node *newnode = _allocateNode(val);
+				node *before = position.node->prev;
+
 				before->next = newnode; newnode->prev = before;
 				newnode->next = position.node; position.node->prev = newnode;
 				return (--position);
@@ -277,14 +283,12 @@ namespace ft
 			// insert [first, last) before position
 			template <typename InputIterator>
 			void insert(iterator position, InputIterator first, InputIterator last,
-					typename ft::enable_if<
-						!is_integral<InputIterator>::value, InputIterator
-					>::type iter = InputIterator())
-			{
-				iter = nullptr;
+						typename ft::enable_if<!is_integral<InputIterator>::value,
+									InputIterator>::type iter = InputIterator())
+			{ static_cast<void>(iter);
 				InputIterator itr = first;
 				while (itr != last)
-					{ insert(position++, itr.node->elem); ++itr; }
+					{ insert(position++, *itr); ++itr; }
 			}
 
 			// delete an element at @position
@@ -299,8 +303,8 @@ namespace ft
 			// delete a range of elements [first, last)
 			iterator erase(iterator first, iterator last)
 			{
-				iterator itr = first; iterator ret = last.node->next;
-				while (itr != last) { erase(itr++); } return (ret);
+				iterator itr = first; while (++itr != last) { erase(itr); }
+				return (iterator(last));
 			}
 
 			void swap(list & other)
@@ -334,14 +338,17 @@ namespace ft
 
 			void clear() { erase(begin(), end()); }
 
+			// splicing removes elements and insert them elsewhere
 			void splice(iterator position, list & other)
 			{
 				insert(position, other.begin(), other.end()); other.clear();
 			}
+
 			void splice(iterator position, list & other, iterator itr)
 			{
 				insert(position, *itr); other.erase(itr);
 			}
+
 			void splice(iterator position, list & other, iterator first, iterator last)
 			{
 				insert(position, first, last); other.erase(first, last);
@@ -372,21 +379,128 @@ namespace ft
 				}
 			}
 
-			void merge(list & x)
+			// merges two lists which are assumed to be sorted.
+			void merge(list & x) { merge(x, &less_than<T>); }
+
+			template <class Compare>
+			void merge(list & x, Compare comp)
 			{
-				if (this == &x) { return ; }
+				if (*this == x)
+					return ;
+				if (_last->next == _last)
+					{ assign(x.begin(), x.end()); x.clear(); return ; }
 				iterator i, j;
 				i = begin(); j = x.begin();
 				while (i != end())
 				{
-					while (j != x.end())
+					while ((j != x.end()) && (comp(*j, *i) == true))
 					{
-						if (//lala
+						insert(i++, j++);
 					}
+					i++;
+				}
+				x.clear();
+			}
+
+			void sort(void) { sort(&less_than<T>); }
+
+			template <class Compare>
+			void sort(Compare comp)
+			{
+				if (_last->next == _last) { return ; }
+				iterator i, j; i = begin();
+				while (i != end())
+				{
+					j = i;
+					while (j != end())
+					{
+						if (comp(*j, *i))
+							splice(i, *this, j);
+						else
+							j++;
+					}
+					i++;
+				}
+			}
+
+			void reverse()
+			{
+				size_type n = size() / 2;
+				node * i, j, swap; i = _last->next; j = _last->prev;
+				while (n--)
+				{
+					swap = i->elem; i = j->elem; j->elem = swap;
+					i = i->next; j = j->prev;
 				}
 			}
 
 	}; // class list
+
+	template <typename T, class Alloc>
+	bool operator==(const list<T, Alloc> & lhs, const list<T, Alloc> & rhs)
+	{
+		if (lhs.size() != rhs.size()) { return (false) ; }
+		typename ft::list<T, Alloc>::const_iterator i = lhs.begin();
+		typename ft::list<T, Alloc>::const_iterator j = rhs.begin();
+		while (i != lhs.end() && j != rhs.end())
+		{
+			if (*i != *j) { return (false); }
+			i++; j++;
+		}
+	}
+
+	template <typename T, class Alloc>
+	bool operator!=(const list<T, Alloc> & lhs, const list<T, Alloc> & rhs)
+	{
+		return (!(rhs == lhs));
+	}
+
+	// compare two lists element by element
+	template <typename T, class Alloc>
+	bool operator<(const list<T, Alloc> & lhs, const list<T, Alloc> & rhs)
+	{
+		typename ft::list<T, Alloc>::const_iterator i = lhs.begin();
+		typename ft::list<T, Alloc>::const_iterator j = rhs.begin();
+		while (i != lhs.end() && j != rhs.end())
+		{
+			if (*i != *j) { return (*i < *j); }
+			i++; j++;
+		}
+		if (lhs.size() == rhs.size()) { return (false); }
+		return (lhs.size() < rhs.size());
+	}
+
+	template <typename T, class Alloc>
+	bool operator<=(const list<T, Alloc> & lhs, const list<T, Alloc> & rhs)
+	{
+		return (!(lhs > rhs));
+	}
+
+	template <typename T, class Alloc>
+	bool operator>(const list<T, Alloc> & lhs, const list<T, Alloc> & rhs)
+	{
+		typename ft::list<T, Alloc>::const_iterator i = lhs.begin();
+		typename ft::list<T, Alloc>::const_iterator j = rhs.begin();
+		while (i != lhs.end() && j != rhs.end())
+		{
+			if (*i != *j) { return (*i > *j); }
+			i++; j++;
+		}
+		if (lhs.size() == rhs.size()) { return (false); }
+		return (lhs.size() > rhs.size());
+	}
+
+	template <typename T, class Alloc>
+	bool operator>=(const list<T, Alloc> & lhs, const list<T, Alloc> & rhs)
+	{
+		return (!(lhs < rhs));
+	}
+
+	template <typename T, class Alloc>
+	void swap(list<T, Alloc> & lhs, list<T, Alloc> & rhs)
+	{
+		lhs.swap(rhs);
+	}
 
 }; // namespace ft
 

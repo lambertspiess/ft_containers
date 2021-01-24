@@ -2,6 +2,7 @@
 
 
 Reset='\033[0m'
+
 Black='\033[30m'
 Red='\033[31m'
 DarkRed='\033[1;31m'
@@ -13,6 +14,7 @@ Purple='\033[0;35m'
 DarkMargenta='\033[1;35m'
 Cyan='\033[36m'
 LightGray='\033[37m'
+
 BW='\033[47m'
 
 echo -e "${Red}${BW}Choose ${BrownOrange}1 ${Red}to ${Cyan}5${Reset}"
