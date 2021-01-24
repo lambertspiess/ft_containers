@@ -397,7 +397,7 @@ namespace ft
 				{
 					while ((j != x.end()) && (comp(*j, *i) == true))
 					{
-						insert(i++, j++);
+						insert(i, *j); i++; j++;
 					}
 					i++;
 				}
@@ -428,10 +428,11 @@ namespace ft
 			void reverse()
 			{
 				size_type n = size() / 2;
-				node * i, j, swap; i = _last->next; j = _last->prev;
+				node * i = _last->next; node * j = _last->prev;
+				node swap;
 				while (n--)
 				{
-					swap = i->elem; i = j->elem; j->elem = swap;
+					swap.elem = i->elem; i->elem = j->elem; j->elem = swap.elem;
 					i = i->next; j = j->prev;
 				}
 			}
@@ -446,9 +447,9 @@ namespace ft
 		typename ft::list<T, Alloc>::const_iterator j = rhs.begin();
 		while (i != lhs.end() && j != rhs.end())
 		{
-			if (*i != *j) { return (false); }
-			i++; j++;
+			if (*i != *j) { return (false); } else { i++; j++; }
 		}
+		return (true);
 	}
 
 	template <typename T, class Alloc>
