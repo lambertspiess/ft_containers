@@ -33,34 +33,33 @@ namespace ft
 	template <typename T>
 	struct list_iterator: public ft::iterator<ft::bidirectional_iterator_tag, T>
 	{
-		typedef list_iterator<T>							self;
-		list_node<T>										*node;
+		typedef list_iterator									self;
+		list_node<T>											*node;
 
-		typedef ft::iterator<ft::bidirectional_iterator_tag, T>	iterator;
-		typedef typename iterator::difference_type			difference_type;
-		typedef typename iterator::iterator_category		iterator_category;
-		typedef typename iterator::value_type				value_type;
-		typedef typename iterator::pointer					pointer;;
-		typedef typename iterator::reference				reference;
+		typedef ft::iterator<ft::bidirectional_iterator_tag, T>	_it;
+		typedef typename _it::difference_type					difference_type;
+		typedef typename _it::iterator_category					iterator_category;
+		typedef typename _it::value_type						value_type;
+		typedef const T *										pointer;
+		typedef const T &										reference;
 
 		list_iterator() : node(nullptr) {}
 		list_iterator(list_node<T> * srcnode) : node(srcnode) {}
 		list_iterator(const self & other) : node(other.node) {}
 		virtual ~list_iterator() {}
 
-		iterator & operator=(const self & rhs) {
+		list_iterator & operator=(const self & rhs) {
 			if (*this == rhs) { return *this; }
 			this->node = rhs.node; return *this;
 		}
 		reference operator*() const { return (this->node)->elem; }
 		pointer operator->() const { return &(this->operator*()); }
-		iterator & operator++() { this->node = this->node->next; return *this; }
-		iterator & operator++(int)
-		{	iterator tmp(this->node); this->node = this->node->next; return tmp; }
-		iterator & operator--() { this->node = this->node->prev; return *this; }
-		iterator & operator--(int)
-		{	iterator tmp = *this; this->node = this->node->prev; return tmp; }
-		// friend so the operator can access private parts (i.e traits_type)
+		self & operator++() { this->node = this->node->next; return *this; }
+		self operator++(int)
+		{	self tmp(*this); this->node = this->node->next; return tmp; }
+		self & operator--() { this->node = this->node->prev; return *this; }
+		self & operator--(int)
+		{	self tmp = *this; this->node = this->node->prev; return tmp; }
 		friend bool operator==(const self & x, const self & y)
 		{	return (x.node == y.node); }
 		friend bool operator!=(const self & x, const self & y)
@@ -72,13 +71,13 @@ namespace ft
 	struct list_const_iterator
 					: public ft::iterator<ft::bidirectional_iterator_tag, T>
 	{
+		typedef list_const_iterator							self;
 		const list_node<T>									*node;
-		typedef list_const_iterator<T>						self;
 
-		typedef ft::iterator<ft::bidirectional_iterator_tag, T>	iterator;
-		typedef typename iterator::difference_type			difference_type;
-		typedef typename iterator::iterator_category		iterator_category;
-		typedef typename iterator::value_type				value_type;
+		typedef ft::iterator<ft::bidirectional_iterator_tag, T>	_it;
+		typedef typename _it::difference_type				difference_type;
+		typedef typename _it::iterator_category				iterator_category;
+		typedef typename _it::value_type					value_type;
 		typedef const T *									pointer;
 		typedef const T &									reference;
 
@@ -94,32 +93,36 @@ namespace ft
 		reference	operator*() const { return ((this->node)->elem); }
 		pointer	operator->() const { return (&(this->operator*())); }
 		self &	operator++() { this->node = this->node->next; return *this; }
-		self &	operator++(int)
-			{ self tmp = *this; this->node = this->node->next; return tmp; }
+		self 	operator++(int)
+			{ self tmp(*this); this->node = this->node->next; return tmp; }
 		self &	operator--() { this->node = this->node->prev; return *this; }
-		self &	operator--(int)
-			{ self tmp = *this; this->node = this->node->prev; return tmp; }
+		self 	operator--(int)
+			{ self tmp(*this); this->node = this->node->prev; return tmp; }
 		friend bool	operator==(const self & x, const self & y)
 			{ return (x.node == y.node); }
 		friend bool	operator!=(const self & x, const self & y)
 			{ return !(x.node == y.node); }
 	};
 
+//ft::iterator<ft::bidirectional_iterator_tag, int, long, int *, int &>'
+//	vs.
+//			'ft::list_iterator<int>
+
 	template <typename T, typename Alloc = std::allocator<T> >
 	class list
 	{
 		public:
+			typedef T										value_type;
 			typedef Alloc									allocator_type;;
 			typedef typename Alloc::pointer					pointer;
 			typedef typename Alloc::const_pointer			const_pointer;
 			typedef typename Alloc::reference				reference;
 			typedef typename Alloc::const_reference			const_reference;
-			typedef T										value_type;
-			typedef typename ft::list_iterator<T>			iterator;
-			typedef typename ft::list_const_iterator<T>		const_iterator;
-			typedef typename ft::reverse_iterator<iterator>	reverse_iterator;
-			typedef typename ft::reverse_iterator<const_iterator>
-														const_reverse_iterator;
+			typedef ft::list_iterator<T>					iterator;
+			typedef ft::list_const_iterator<T>				const_iterator;
+			typedef ft::reverse_iterator<iterator>			reverse_iterator;
+			typedef ft::reverse_iterator<const_iterator>
+															const_reverse_iterator;
 			typedef size_t									size_type;
 			typedef ptrdiff_t								difference_type;
 		protected:
@@ -280,12 +283,11 @@ namespace ft
 			void insert(iterator position, size_type n, const value_type & val)
 				{ while (n--) { insert(position, val); } }
 
-			// insert [first, last) before position
 			template <typename InputIterator>
 			void insert(iterator position, InputIterator first, InputIterator last,
 						typename ft::enable_if<!is_integral<InputIterator>::value,
-									InputIterator>::type iter = InputIterator())
-			{ static_cast<void>(iter);
+									InputIterator>::type * = nullptr)
+			{
 				InputIterator itr = first;
 				while (itr != last)
 					{ insert(position++, *itr); ++itr; }
