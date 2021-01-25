@@ -6,7 +6,9 @@ VPATH = .:.:test
 
 INCLUDES += includes.hpp
 INCLUDES += iterators.hpp
+INCLUDES += enable_if.hpp.hpp
 INCLUDES += list.hpp
+INCLUDES += vector.hpp
 
 SRCS	= $(addprefix ./test/, $(addsuffix _test.cpp, $(NAME)) test.cpp)
 

@@ -104,10 +104,6 @@ namespace ft
 			{ return !(x.node == y.node); }
 	};
 
-//ft::iterator<ft::bidirectional_iterator_tag, int, long, int *, int &>'
-//	vs.
-//			'ft::list_iterator<int>
-
 	template <typename T, typename Alloc = std::allocator<T> >
 	class list
 	{
