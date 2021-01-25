@@ -411,6 +411,7 @@ namespace ft
 					tmp = j; ++j;
 					splice(i, x, tmp);
 				}
+			}
 
 			void sort(void) { sort(&less_than<T>); }
 

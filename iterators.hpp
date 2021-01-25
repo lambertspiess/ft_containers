@@ -318,6 +318,6 @@ namespace ft
 
 	// RANDOM ACCESS ITERATOR
 
-} // namespace ft
+}; // namespace ft
 
 #endif // ITERATORS_HPP
