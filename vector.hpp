@@ -36,7 +36,7 @@ namespace ft
 //			node											*_last;
 //			allocator_type									_alloc;
 //	}
-} // namespace ft
+}; // namespace ft
 
 
 #endif

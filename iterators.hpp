@@ -23,7 +23,7 @@ namespace ft
 	 * used in specializations and overloading.
 	 */
 	template<typename Category, typename T, typename Distance = ptrdiff_t,
-	         typename Pointer = T*, typename Reference = T&>
+			typename Pointer = T*, typename Reference = T&>
 	struct iterator
 	{
 		typedef Category									iterator_category;
@@ -43,6 +43,9 @@ namespace ft
 	 * provide tighter, more correct semantics.
 	 */
 	template<typename Iterator>
+	struct iterator_traits;
+
+	template<typename Iterator>
 	struct iterator_traits
 	{
 		typedef typename Iterator::iterator_category		iterator_category;
@@ -53,25 +56,25 @@ namespace ft
 	};
 	
 	// Partial specialization for pointer types.
-	template<typename T>
-	struct iterator_traits<T*>
+	template<typename Tp>
+	struct iterator_traits<Tp*>
 	{
 		typedef random_access_iterator_tag					iterator_category;
-		typedef T											value_type;
+		typedef Tp											value_type;
 		typedef ptrdiff_t									difference_type;
-		typedef T *											pointer;
-		typedef T &											reference;
+		typedef Tp *											pointer;
+		typedef Tp &											reference;
 	};
 	
 	// Partial specialization for const pointer types.
-	template<typename T>
-	struct iterator_traits<const T*>
+	template<typename Tp>
+	struct iterator_traits<const Tp*>
 	{
 		typedef random_access_iterator_tag					iterator_category;
-		typedef T											value_type;
+		typedef Tp											value_type;
 		typedef ptrdiff_t									difference_type;
-		typedef const T *									pointer;
-		typedef const T &									reference;
+		typedef const Tp *									pointer;
+		typedef const Tp &									reference;
 	};
 
 /*
