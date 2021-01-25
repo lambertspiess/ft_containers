@@ -6,7 +6,7 @@
 /*   By: sanam <marvin@42.fr>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/09/16 14:36:56 by sanam             #+#    #+#             */
-/*   Updated: 2021/01/23 23:55:15 by lspiess          ###   ########.fr       */
+/*   Updated: 2021/01/25 18:09:19 by lspiess          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ void print(L& l)
 int main()
 {
 	{
-		title("Default construct test");
+		title("Default construct test");//============================
 		blue("ft::list<int> my");
 		ft::list<int> m;
 		print(m);
@@ -39,7 +39,7 @@ int main()
 		print(o);
 
 
-		title("fill constructor test");
+		title("fill constructor test");//============================
 		blue("ft::list<int> fill(10, 10)");
 		ft::list<int> fill(10, 10);
 		print(fill);
@@ -53,18 +53,18 @@ int main()
 			m.push_back(i);
 			o.push_back(i);
 		}
-		print(m);
+		print(m); print(o);
 
-		title("range constructor test");
-		blue("ft::list<int> range(m.begin(), m.end())");
-		ft::list<int> range(m.begin(), m.end());
-		print(range);
+		title("range constructor test");//============================
+		blue("ft::list<int> mrange(m.begin(), m.end())");
+		ft::list<int> mrange(m.begin(), m.end());
+		print(mrange);
 
 		yellow("std::list<int> orange(o.begin(), o.end())");
-		ft::list<int> orange(o.begin(), o.end());
+		std::list<int> orange(o.begin(), o.end());
 		print(orange);
 
-		title("Copy constructor test");
+		title("Copy constructor test");//============================
 		blue("ft::list<int> copy(m)");
 		ft::list<int> copy(m);
 		print(copy);
@@ -72,7 +72,7 @@ int main()
 		std::list<int> ocopy(o);
 		print(ocopy);
 
-		title("empty and size check");
+		title("empty and size check");//============================
 		std::cout << "m.size(): " << m.size() << std::endl;
 		std::cout << "o.size(): " << o.size() << std::endl;
 		if (m.empty())
@@ -80,7 +80,7 @@ int main()
 		else
 			std::cout << "Not empty" << std::endl;
 
-		title("max size");
+		title("max size");//============================
 		std::cout << "m.max_size(): " << m.max_size() << std::endl;
 		std::cout << "o.max_size(): " << o.max_size() << std::endl;
 
@@ -88,7 +88,7 @@ int main()
 		std::cout << "m.front(): " << m.front() << " m.back(): " << m.back() << std::endl;
 		std::cout << "o.front(): " << o.front() << " o.back(): " << o.back() << std::endl;
 
-		title("push_front and pop_front test");
+		title("push_front and pop_front test");//============================
 		blue("m.push_front(100)");
 		m.push_front(100);
 		print(m);
@@ -103,7 +103,7 @@ int main()
 		o.pop_front();
 		print(o);
 
-		title("push_back and pop_back test");
+		title("push_back and pop_back test");//============================
 		blue("m.push_back(100)");
 		m.push_back(100);
 		print(m);
@@ -118,7 +118,7 @@ int main()
 		o.pop_back();
 		print(o);
 
-		title("single element insert(position, val)");
+		title("single element insert(position, val)");//=====================
 		blue("m.insert(m.end(), 30)");
 		m.insert(m.end(), 30);
 		print(m);
@@ -127,7 +127,7 @@ int main()
 		o.insert(o.end(), 30);
 		print(o);
 
-		title("fill insert(position, n, val)");
+		title("fill insert(position, n, val)");//============================
 		blue("m.insert(m.begin(), 5, 55)");
 		m.insert(m.begin(), 5, 55);
 		print(m);
@@ -135,7 +135,7 @@ int main()
 		o.insert(o.begin(), 5, 55);
 		print(o);
 
-		title("range insert(position, first, last)");
+		title("range insert(position, first, last)");//======================
 		blue("m.insert(m.begin(), ++m.begin(), m.end());");
 		m.insert(m.begin(), ++m.begin(), m.end());
 		print(m);
@@ -144,16 +144,18 @@ int main()
 		print(o);
 
 
-		title("erase(position) test");
+		title("erase(position) test");//======================
+		print(m);
 		blue("m.erase(m.end())");
 		m.erase(--m.end());
 		print(m);
 		yellow("o.erase(o.end())");
+		print(o);
 		o.erase(--o.end());
 		print(o);
 
 
-		title("erase(first, last) test");
+		title("erase(first, last) test");//======================
 		ft::list<int>::iterator ftIter = m.begin();
 		ftIter++; ftIter++; ftIter++; ftIter++;
 
@@ -168,20 +170,24 @@ int main()
 		o.erase(o.begin(), stdIter);
 		print(o);
 
-		title("sigle element splice(position, x, i)");
+		title("single element splice(position, x, i)");//=====================
 		ft::list<int> m2(5, 123);
 		print(m2);
+		print(m);
 		blue("m.splice(m.end(), m2, m2.begin())");
 		m.splice(m.end(), m2, m2.begin());
+		print(m2);
 		print(m);
 
+		blue("same with std");
 		std::list<int> o2(5, 123);
 		print(o2);
 		blue("o.splice(o.end(), o2, o2.begin())");
 		o.splice(o.end(), o2, o2.begin());
+		print(o2);
 		print(o);
 
-		title("entire splice test");
+		title("entire splice test");//=====================
 		blue("m.splice(m.end(), m2)");
 		m.splice(m.end(), m2);
 		print(m);
@@ -190,7 +196,7 @@ int main()
 		o.splice(o.end(), o2);
 		print(o);
 
-		title("remove test");
+		title("remove test");//================================
 		blue("m.remove(123)");
 		m.remove(123);
 		print(m);
@@ -205,7 +211,7 @@ int main()
 		o.remove(55);
 		print(o);
 
-		title("remove_if test (remove if ele over 15)");
+		title("remove_if test (remove if ele over 15)");//===================
 		blue("m.remove_if(remove_over)");
 		m.remove_if(remove_over);
 		print(m);
@@ -214,40 +220,43 @@ int main()
 		o.remove_if(remove_over);
 		print(o);
 
-		title("sort test");
+		title("sort test");//===================
 		blue("m.sort()");
+		print(m);
 		m.sort();
 		print(m);
 		yellow("o.sort()");
+		print(o);
 		o.sort();
 		print(o);
 
-		title("unique test");
+		title("unique test");//===================
 		blue("m.unique()");
+		print(m);
 		m.unique();
 		print(m);
 
 		yellow("o.unique()");
+		print(o);
 		o.unique();
 		print(o);
 
-		title("merge test");
+		title("merge test");//===================
 		for(int i = 1; i < 10; i += 2)
 		{
 			m2.push_back(i);
 			o2.push_back(i);
 		}
-		blue("m2 and o2");
-		print(m2);
-		print(o2);
 		blue("m.merge(m2)");
+		print(m); print(m2);
 		m.merge(m2);
-		print(m);
+		print(m); print(m2);
 		yellow("o.merge(o2)");
+		print(o); print(o2);
 		o.merge(o2);
-		print(o);
+		print(o); print(o2);
 
-		title("merge test2");
+		title("merge test2");//===================
 		m.unique();
 		o.unique();
 		for(int i = 1; i < 10; i += 2)
@@ -262,7 +271,7 @@ int main()
 		o.merge(o2, comp);
 		print(o);
 
-		title("reverse test");
+		title("reverse test");//===================
 		blue("m.reverse()");
 		m.reverse();
 		print(m);
@@ -270,7 +279,7 @@ int main()
 		o.reverse();
 		print(o);
 
-		title("clear test");
+		title("clear test");//===================
 		blue("m.clear()");
 		m.clear();
 		std::cout << "m size: " << m.size() << std::endl;

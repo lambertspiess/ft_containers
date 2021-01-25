@@ -180,18 +180,17 @@ namespace ft
 			}
 
 			// range ctor.
-			// enable_if idiom makes sure InputIterator isn't an integral type
 			template <typename InputIterator>
 			list(InputIterator first, InputIterator last,
 				const allocator_type & a = allocator_type(),
 				typename ft::enable_if<!ft::is_integral<InputIterator>::value,
-							InputIterator>::type iter = InputIterator())
+							InputIterator>::type * = nullptr)
 			: _alloc(a)
-			{ static_cast<void>(iter);
+			{
 				_last = _node_alloc.allocate(1);
-				_node_alloc.construct(_last, list_node<T>());
+				_node_alloc.construct(_last, node());
 				_last->prev = _last; _last->next = _last;
-				insert(end(), first, last);
+				insert(begin(), first, last);
 			}
 
 			// copy ctor
@@ -201,7 +200,7 @@ namespace ft
 				_last = _node_alloc.allocate(1);
 				_node_alloc.construct(_last, list_node<T>());
 				_last->prev = _last; _last->next = _last;
-				insert(end(), src.begin(), src.end());
+				insert(begin(), src.begin(), src.end());
 			}
 
 			~list() { clear(); delete _last; }
@@ -217,11 +216,11 @@ namespace ft
 			const_iterator begin() const { return (const_iterator(_last->next)); }
 			// return an iterator to the past-the-end element
 			iterator end() { return (iterator(_last)); }
-			const_iterator end() const { return (const_iterator(_last)); }
-			reverse_iterator rbegin() { return (reverse_iterator(_last->next)); }
-			reverse_iterator rbegin() const { return (const_reverse_iterator(_last->next)); }
-			reverse_iterator rend() { return (reverse_iterator(_last)); }
-			reverse_iterator rend() const { return (const_reverse_iterator(_last)); }
+			const_iterator end() const { return const_iterator(_last); }
+			reverse_iterator rbegin() { return reverse_iterator(_last); }
+			reverse_iterator rbegin() const { return const_reverse_iterator(_last); }
+			reverse_iterator rend() { return reverse_iterator(begin()); }
+			reverse_iterator rend() const { return const_reverse_iterator(begin()); }
 
 			// Capacity
 			bool empty() const { return (_last->next == _last ? true : false); }
@@ -248,9 +247,8 @@ namespace ft
 				typename ft::enable_if<
 								!is_integral<InputIterator>::value,
 								InputIterator
-									>::type iter = InputIterator())
+									>::type * = nullptr)
 				{
-					static_cast<void>(iter);
 					insert(end(), first, last);
 				}
 
@@ -264,7 +262,7 @@ namespace ft
 			void pop_front() { erase(begin()); }
 
 			void push_back(const value_type & val)
-				{ insert(begin(), val); }
+				{ insert(end(), val); }
 
 			void pop_back() { iterator itr(end()); --itr; erase(itr); }
 
@@ -290,7 +288,7 @@ namespace ft
 			{
 				InputIterator itr = first;
 				while (itr != last)
-					{ insert(position++, *itr); ++itr; }
+					{ insert(position, *itr); ++itr; }
 			}
 
 			// delete an element at @position
@@ -305,7 +303,8 @@ namespace ft
 			// delete a range of elements [first, last)
 			iterator erase(iterator first, iterator last)
 			{
-				iterator itr = first; while (++itr != last) { erase(itr); }
+				iterator itr = first;
+				while (itr != last) { erase(itr); itr++; }
 				return (iterator(last));
 			}
 
@@ -360,7 +359,7 @@ namespace ft
 			{
 				iterator itr = begin();
 				while (itr != end())
-					{ if (*itr == val) { erase(itr); } else { ++itr; } }
+					{ if (*itr == val) { itr = erase(itr); } else { ++itr; } }
 			}
 
 			template <class Predicate>
@@ -368,15 +367,20 @@ namespace ft
 			{
 				iterator itr = begin();
 				while (itr != end())
-					{ if (pred(*itr) == true) { erase(itr); } else { ++itr; } }
+					{ if (pred(*itr) == true) { itr = erase(itr); } else { ++itr; } }
 			}
 
 			void unique()
 			{
-				iterator i, j; i = begin(); j = i;
+				iterator i, j, tmp; i = begin(); j = i;
 				while (i != end())
 				{
-					j = i; ++j; while (j != end() && *j == *i) { erase(j); }
+					j = i; ++j;
+					while (j != end())
+					{
+						if (*j == *i) { tmp = j; j++; erase(tmp); }
+						else { j++; }
+					}
 					++i;
 				}
 			}
@@ -387,22 +391,30 @@ namespace ft
 			template <class Compare>
 			void merge(list & x, Compare comp)
 			{
-				if (*this == x)
-					return ;
+				if (*this == x) { return ; }
 				if (_last->next == _last)
 					{ assign(x.begin(), x.end()); x.clear(); return ; }
-				iterator i, j;
-				i = begin(); j = x.begin();
+
+				iterator i, j, tmp;
+				i = begin();
 				while (i != end())
 				{
-					while ((j != x.end()) && (comp(*j, *i) == true))
+					j = x.begin();
+					while (j != x.end())
 					{
-						insert(i, *j); i++; j++;
+						if (comp(*j, *i) == true)
+							{ tmp = j; ++j; splice(i, x, tmp); }
+						else
+							++j;
 					}
 					i++;
 				}
-				x.clear();
-			}
+				j = x.begin();
+				while (j != x.end())
+				{
+					tmp = j; ++j;
+					splice(i, x, tmp);
+				}
 
 			void sort(void) { sort(&less_than<T>); }
 
@@ -414,12 +426,9 @@ namespace ft
 				while (i != end())
 				{
 					j = i;
-					while (j != end())
+					while (++j != end())
 					{
-						if (comp(*j, *i))
-							splice(i, *this, j);
-						else
-							j++;
+						if (comp(*j, *i)) { splice(i, *this, j); }
 					}
 					i++;
 				}
