@@ -1,6 +1,7 @@
 NAME	= $N
 CC		= clang++
-CFLAGS	= -Wall -Wextra -Werror -std=c++98 #-fsanitize=address,undefined
+CFLAGS	= -Wall -Wextra -Werror -std=c++98 -ferror-limit=5 *.hpp
+#-fsanitize=address,undefined
 
 VPATH = .:.:test
 
