@@ -46,13 +46,13 @@ namespace ft
 			random_access_iterator & operator++(void)
 				{ _elem++; return (*this); }
 
-			random_access_iterator & operator++(int)
+			random_access_iterator operator++(int)
 				{ random_access_iterator ret(*this); _elem++; return (ret); }
 
 			random_access_iterator & operator--(void)
 				{ _elem--; return (*this); }
 
-			random_access_iterator & operator--(int)
+			random_access_iterator operator--(int)
 				{ random_access_iterator ret(*this); _elem--; return (ret); }
 
 			random_access_iterator operator+(difference_type n) const

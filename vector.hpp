@@ -63,7 +63,7 @@ namespace ft
 			}
 
 			vector (const vector & other)
-			: _alloc(other.alloc), _start(nullptr), _end(nullptr), _memend(nullptr)
+			: _alloc(other._alloc), _start(nullptr), _end(nullptr), _memend(nullptr)
 			{
 				insert(begin(), other.begin(), other.end());
 			}
@@ -82,6 +82,7 @@ namespace ft
 			{
 				if (*this == other) { return *this; }
 				clear(); insert(end(), other.begin(), other.end());
+				return (*this);
 			}
 
 			iterator begin() { return (_start); }
@@ -108,7 +109,7 @@ namespace ft
 				else if (n > capacity())
 				{
 					pointer old_start = _start, old_end = _end;
-					size_type old_size = size(), old_capacity = capacity();
+					size_type old_capacity = capacity();
 					_start = _alloc.allocate(n);
 					_end = _start; _memend =  _start + n;
 					pointer swap, itr = old_start;
@@ -122,7 +123,7 @@ namespace ft
 				}
 			}
 
-			void resize(size_type n, value_type val)
+			void resize(size_type n, value_type val = value_type())
 			{
 				size_type cur = size();
 				if (cur > n) { erase(begin() + n, end()); }
@@ -155,11 +156,17 @@ namespace ft
 			template <class InputIterator>
 			void assign(InputIterator first, InputIterator last,
 						typename ft::enable_if<
-									!is_integral<InputIterator>::value, InputIterator
+									!ft::is_integral<InputIterator>::value, InputIterator
 											>::type * = nullptr)
 			{
-				clear(); _end = begin();
+				clear();
 				while (first != last) { insert(_end++, 1, (*first)++); }
+			}
+
+			void assign(size_type n, const value_type & val)
+			{
+				clear(); if (capacity() < n) { reserve(n); }
+				insert(end(), n, val);
 			}
 
 			void push_back(const value_type & val) { insert(end(), val); }
@@ -170,10 +177,103 @@ namespace ft
 
 			void insert(iterator position, size_type n, const value_type & val)
 			{
-				// lala
+				if (size() + n > capacity())
+				{
+					pointer old_start = _start, old_end = _end;
+					size_type old_size = size(), old_capacity = capacity();
+					_start = _alloc.allocate(old_size + n);
+					_end = _start; _memend = _start + old_size + n;
+					pointer tmp;
+					while (old_start != old_end)
+					{
+						if (old_start == position.base())
+						{
+							while (n-- > 0) { _alloc.construct(_end++, val); }
+						}
+						tmp = old_start++;
+						_alloc.construct(_end++, *tmp);
+						_alloc.destroy(tmp);
+					}
+					_alloc.deallocate(old_start, old_capacity);
+				}
+			}
+
+			template <class InputIterator>
+			void insert(iterator position, InputIterator first, InputIterator last,
+						typename ft::enable_if<
+									!ft::is_integral<InputIterator>::value, InputIterator
+								>::type * = nullptr)
+			{
+				size_type n = distance(first, last);
+				if (size() + n > capacity())
+				{
+					pointer old_start = _start, old_start_save = _start, old_end = _end;
+					size_type old_size = size(), old_capacity = capacity();
+					_start = _alloc.allocate(old_size + n);
+					_end = _start; _memend = _start + old_size + n;
+					pointer tmp;
+					while (old_start != old_end)
+					{
+						if (old_start == position.base())
+						{
+							while (first != last)
+							{
+								_alloc.construct(_end++, *first);
+								++first;
+							}
+						}
+						tmp = old_start++;
+						_alloc.construct(_end++, *tmp);
+						_alloc.destroy(tmp);
+					}
+					_alloc.deallocate(old_start_save, old_capacity);
+				}
+			}
+
+			iterator erase(iterator position) { return erase(position, position + 1); }
+
+			iterator erase(iterator first, iterator last)
+			{
+				iterator itr = first, tmp;
+				while (itr != last) { tmp = itr++; _alloc.destroy(tmp.base()); }
+				if (last != end())
+				{
+					iterator old_end = end(); _end = first.base();
+					while (last != old_end)
+					{
+						tmp = last++;
+						_alloc.construct(_end++, *tmp);
+						_alloc.destroy(tmp.base());
+					}
+				}
+				return (first);
 			}
 
 	}; // class vector
+
+	template <class T, class Alloc>
+	bool operator==(const vector<T, Alloc> & lhs, const vector<T, Alloc> & rhs)
+	{
+		if (lhs.size() != rhs.size()) { return false; }
+		typename vector<T, Alloc>::size_type i = 0;
+		while (i < lhs.size())
+		{
+			if (lhs[i] == rhs[i]) { ++i; } else  { return false; }
+		}
+		return true ;
+	}
+
+	template <class T, class Alloc>
+	bool operator!=(const vector<T, Alloc> & lhs, const vector<T, Alloc> & rhs)
+	{
+		if (lhs.size() != rhs.size()) { return false; }
+		typename vector<T, Alloc>::size_type i = 0;
+		while (i < lhs.size())
+		{
+			if (lhs[i] == rhs[i]) { ++i; } else  { return false; }
+		}
+		return true ;
+	}
 
 }; // namespace ft
 
