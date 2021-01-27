@@ -35,7 +35,7 @@ namespace ft
 			pointer											_memend;
 
 		public:
-			explicit vector(const allocator_type & alloc)
+			explicit vector(const allocator_type & alloc = allocator_type())
 			: _alloc(alloc), _start(nullptr), _end(nullptr), _memend(nullptr) {}
 
 			explicit vector(size_type n, const value_type & val = value_type(),
@@ -63,8 +63,7 @@ namespace ft
 			}
 
 			vector (const vector & other)
-			: _alloc(other.alloc), _start(other._start), _end(other._end),
-				_memend(other._memend)
+			: _alloc(other.alloc), _start(nullptr), _end(nullptr), _memend(nullptr)
 			{
 				insert(begin(), other.begin(), other.end());
 			}
@@ -136,17 +135,42 @@ namespace ft
 				while (ptr != _end) { _alloc.destroy(ptr++); }
 			}
 
-			reference operator[] (size_type n) { return(_arr[n]); }
-			const_reference operator[] (size_type n) const { return(_arr[n]); }
+			reference operator[] (size_type n) { return(_start[n]); }
+			const_reference operator[] (size_type n) const { return(_start[n]); }
 			reference at(size_type n)
 			{
 				if (n >= size()) { throw std::out_of_range("out of range"); }
 				return (_start[n]);
 			}
-			reference at(size_type n) const
+			const_reference at(size_type n) const
 			{
 				if (n >= size()) { throw std::out_of_range("out of range"); }
 				return (_start[n]);
+			}
+			reference front() { return (*begin()); }
+			const_reference front() const { return (*begin()); }
+			reference back() { return (*--end()); }
+			const_reference back() const { return (*--end()); }
+
+			template <class InputIterator>
+			void assign(InputIterator first, InputIterator last,
+						typename ft::enable_if<
+									!is_integral<InputIterator>::value, InputIterator
+											>::type * = nullptr)
+			{
+				clear(); _end = begin();
+				while (first != last) { insert(_end++, 1, (*first)++); }
+			}
+
+			void push_back(const value_type & val) { insert(end(), val); }
+			void pop_back() { erase(--end()); }
+
+			iterator insert(iterator pos, const value_type & val)
+				{ insert(pos, 1, val); return (pos); }
+
+			void insert(iterator position, size_type n, const value_type & val)
+			{
+				// lala
 			}
 
 	}; // class vector
