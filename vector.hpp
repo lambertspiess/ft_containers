@@ -4,6 +4,7 @@
 # include <memory>
 # include <cstddef>
 # include "iterators.hpp"
+# include "random_access_iterator.hpp"
 # include "enable_if.hpp"
 
 namespace ft
@@ -24,7 +25,8 @@ namespace ft
 			typedef ft::reverse_iterator<const_iterator>
 															const_reverse_iterator;
 			typedef typename Alloc::size_type				size_type;
-			typedef ft::iterator_traits<iterator>::difference_type	difference_type;
+			typedef typename ft::iterator_traits<iterator>::difference_type
+															difference_type;
 
 		private:
 			allocator_type									_alloc;
@@ -37,11 +39,11 @@ namespace ft
 			: _alloc(alloc), _start(nullptr), _end(nullptr), _memend(nullptr) {}
 
 			explicit vector(size_type n, const value_type & val = value_type(),
-							cons allocator_type & alloc = allocator_type())
-			: _alloc(alloc), _start(nullptr), _end(nullptr), _memend(nullptr) {}
+							const allocator_type & alloc = allocator_type())
+			: _alloc(alloc), _start(nullptr), _end(nullptr), _memend(nullptr)
 			{
 				_start = _alloc.allocate(n); _memend = _start + n;
-				_end = start;
+				_end = _start;
 				size_type i = 0; while (i++ < n) { _alloc.construct(_end++, val); }
 			}
 
@@ -51,10 +53,11 @@ namespace ft
 					typename ft::enable_if<
 									!ft::is_integral<InputIterator>::value, InputIterator
 								>::type * = nullptr)
-			: _alloc(alloc), _start(nullptr), _end(nullptr), _memend(nullptr) {}
+			: _alloc(alloc), _start(nullptr), _end(nullptr), _memend(nullptr)
 			{
+				difference_type n = ft::distance(first, last);
 				_start = _alloc.allocate(n); _memend = _start + n;
-				_end = start;
+				_end = _start;
 				iterator itr = first;
 				while (itr != last) { _alloc.construct(_end++, (*first)++); }
 			}
@@ -85,21 +88,58 @@ namespace ft
 			iterator begin() { return (_start); }
 			const_iterator begin() const { return (_start); }
 			iterator end() { return (_start); }
-			const_iterator begin() const { return (_start); }
+			const_iterator end() const { return (_start); }
 
 			reverse_iterator rbegin() { return reverse_iterator(end()); }
 			const_reverse_iterator rbegin() const { return reverse_iterator(end()); }
 			reverse_iterator rend() { return reverse_iterator(begin()); }
 			const_reverse_iterator rend() const { return reverse_iterator(begin()); }
 
-			size_type size(void) { return (_end - _start); }
+			size_type size(void) const { return (_end - _start); }
+
+			size_type max_size(void) const { return (allocator_type().max_size()); }
+
+			size_type capacity(void) const { return (_memend - _start); }
+
+			bool empty(void) const { return (size() == 0 ? true : false); }
+
+			void reserve(size_type n)
+			{
+				if (n > max_size()) { throw (std::length_error("vector::reserve")); }
+				else if (n > capacity())
+				{
+					pointer old_start = _start, old_end = _end;
+					size_type old_size = size(), old_capacity = capacity();
+					_start = _alloc.allocate(n);
+					_end = _start; _memend =  _start + n;
+					pointer swap, itr = old_start;
+					while (itr != old_end)
+					{
+						swap = itr++;
+						_alloc.construct(_end++, *swap);
+						_alloc.destroy(swap);
+					}
+					_alloc.deallocate(old_start, old_capacity);
+				}
+			}
+
+			void resize(size_type n, value_type val)
+			{
+				size_type cur = size();
+				if (cur > n) { erase(begin() + n, end()); }
+				if (cur < n) { insert(end(), n - cur, val); }
+			}
 
 			void clear()
 			{
 				pointer ptr = _start;
 				while (ptr != _end) { _alloc.destroy(ptr++); }
 			}
-	}
+
+			
+
+	}; // class vector
+
 }; // namespace ft
 
 
