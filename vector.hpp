@@ -245,45 +245,8 @@ namespace ft
 //						std::cout << "lele\n";
 						_alloc.construct(ptr++, val);
 					}
-
-//					pointer old_end = _end; _end += n; 
-//					std::cout << "old_end = " << old_end << "\n";
-//					std::cout << "position.base() = " << pos << "\n";
-//					std::cout << "_start = " << _start << "\n";
-//					std::cout << "_end = " << _end << "\n";
-//					std::cout << "end().base() = " << end().base() << "\n";
-//					while (old_end != pos)
-//					{
-//						std::cout << old_end << " ";
-//						old_end--;
-//					}
 				}
 			}
-
-//	if (size() + n > capacity())
-//	{
-//		pointer old_start = _start, old_end = _end;
-//		size_type old_size = size(), old_capacity = capacity();
-//		_start = _alloc.allocate(old_size + n);
-//		_end = _start; _memend = _start + old_size + n;
-//		pointer tmp;
-//		while (old_start != old_end)
-//		{
-//			if (old_start == position.base())
-//			{
-//				while (n-- > 0) { _alloc.construct(_end++, val); }
-//			}
-//			tmp = old_start++;
-//			_alloc.construct(_end++, *tmp);
-//			_alloc.destroy(tmp);
-//		}
-//		_alloc.deallocate(old_start, old_capacity);
-//	}
-//	else
-//	{
-//		size_type len_til_pos = &(*position) - _start;
-//		for (
-//	}
 
 			template <class InputIterator>
 			void insert(iterator position, InputIterator first, InputIterator last,
@@ -292,28 +255,38 @@ namespace ft
 								>::type * = nullptr)
 			{
 				size_type n = distance(first, last);
-				if (size() + n > capacity())
+				size_type newsize = size() + n;
+				pointer pos = &*position;
+				int dist_to_pos = pos - _start;
+				if (newsize > capacity())
 				{
-					pointer old_start = _start, old_start_save = _start, old_end = _end;
-					size_type old_size = size(), old_capacity = capacity();
-					_start = _alloc.allocate(old_size + n);
-					_end = _start; _memend = _start + old_size + n;
-					pointer tmp;
-					while (old_start != old_end)
+					reserve(newsize);
+					pos = _start + dist_to_pos;
+				}
+				if (empty())
+				{
+					size_type i = 0;
+					while (i < n)
 					{
-						if (old_start == position.base())
-						{
-							while (first != last)
-							{
-								_alloc.construct(_end++, *first);
-								++first;
-							}
-						}
-						tmp = old_start++;
-						_alloc.construct(_end++, *tmp);
-						_alloc.destroy(tmp);
+						_alloc.construct(_start + i, *first); i++; first++;
 					}
-					_alloc.deallocate(old_start_save, old_capacity);
+					_end = _start + n;
+				}
+				else
+				{
+					pointer old_end = _end; _end += n; pointer ptr = _end;
+					if (old_end != pos)
+					{
+						while (--old_end != pos)
+						{
+							*(--ptr) = *old_end; _alloc.destroy(old_end);
+						}
+					}
+					ptr = pos;
+					while (n--)
+					{
+						_alloc.construct(ptr++, *first); first++;
+					}
 				}
 			}
 

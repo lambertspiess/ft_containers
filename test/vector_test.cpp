@@ -22,17 +22,12 @@ int main(void)
 {
 	ft::vector<int> ftBase;
 	std::vector<int> stdBase;
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < 10; ++i) {
 		ftBase.push_back(i);
-		print(ftBase);
 	}
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < 10; ++i) {
 		stdBase.push_back(i);
 	}
-
-	print(ftBase);
-
-//	print(stdBase);
 
 //	{
 //		ft::vector<int> test;
@@ -73,19 +68,19 @@ int main(void)
 //		std::vector<int> ori2(ori.begin(), ori.begin() + 5);
 //		print(ori2);
 //	}
-//	{
-//		title("copy constructor test");
-//		blue("ftBase");
-//		print(ftBase);
-//		blue("ft::vector<int< my(ftBase)");
-//		ft::vector<int> my(ftBase);
-//		print(my);
-//
-//		yellow("std::vector<int> ori(stdBase)");
-//		std::vector<int> ori(stdBase);
-//		print(stdBase);
-//		print(ori);
-//
+	{
+		title("copy constructor test");
+		blue("ftBase");
+		print(ftBase);
+		blue("ft::vector<int< my(ftBase)");
+		ft::vector<int> my(ftBase);
+		print(my);
+
+		yellow("std::vector<int> ori(stdBase)");
+		std::vector<int> ori(stdBase);
+		print(stdBase);
+		print(ori);
+
 //		title("assign test");
 //		blue("ft::vector<int> a; a = ftBase");
 //		ft::vector<int> a; a = ftBase;
@@ -250,5 +245,5 @@ int main(void)
 //		yellow("ori.clear()");
 //		ori.clear();
 //		print(ori);
-//	}
+	}
 }
