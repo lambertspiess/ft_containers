@@ -6,6 +6,7 @@
 # include "iterators.hpp"
 # include "random_access_iterator.hpp"
 # include "enable_if.hpp"
+# include <iostream>
 
 namespace ft
 {
@@ -19,8 +20,9 @@ namespace ft
 			typedef typename Alloc::const_pointer			const_pointer;
 			typedef typename Alloc::reference				reference;
 			typedef typename Alloc::const_reference			const_reference;
-			typedef ft::random_access_iterator<T>			iterator;
-			typedef ft::random_access_iterator<const T>		const_iterator;
+			typedef ft::random_access_iterator<value_type>	iterator;
+			typedef ft::random_access_iterator<const value_type>
+															const_iterator;
 			typedef ft::reverse_iterator<iterator>			reverse_iterator;
 			typedef ft::reverse_iterator<const_iterator>
 															const_reverse_iterator;
@@ -36,7 +38,8 @@ namespace ft
 
 		public:
 			explicit vector(const allocator_type & alloc = allocator_type())
-			: _alloc(alloc), _start(nullptr), _end(nullptr), _memend(nullptr) {}
+			: _alloc(alloc), _start(nullptr), _end(nullptr), _memend(nullptr)
+			{}
 
 			explicit vector(size_type n, const value_type & val = value_type(),
 							const allocator_type & alloc = allocator_type())
@@ -44,7 +47,8 @@ namespace ft
 			{
 				_start = _alloc.allocate(n); _memend = _start + n;
 				_end = _start;
-				size_type i = 0; while (i++ < n) { _alloc.construct(_end++, val); }
+				size_type i = 0;
+				while (i++ < n) { _alloc.construct(_end++, val); }
 			}
 
 			template <class InputIterator>
@@ -59,7 +63,7 @@ namespace ft
 				_start = _alloc.allocate(n); _memend = _start + n;
 				_end = _start;
 				iterator itr = first;
-				while (itr != last) { _alloc.construct(_end++, (*first)++); }
+				while (itr != last) { _alloc.construct(_end++, *itr); itr++; }
 			}
 
 			vector (const vector & other)
@@ -87,8 +91,14 @@ namespace ft
 
 			iterator begin() { return (_start); }
 			const_iterator begin() const { return (_start); }
-			iterator end() { return (_start); }
-			const_iterator end() const { return (_start); }
+
+			iterator end()
+			{
+				std::cout << "In end(), _end = " << _end << "\n";
+				return (_end);
+			}
+
+			const_iterator end() const { return (_end); }
 
 			reverse_iterator rbegin() { return reverse_iterator(end()); }
 			const_reverse_iterator rbegin() const { return reverse_iterator(end()); }
@@ -108,6 +118,9 @@ namespace ft
 				if (n > max_size()) { throw (std::length_error("vector::reserve")); }
 				else if (n > capacity())
 				{
+
+					// fix reserve
+
 					pointer old_start = _start, old_end = _end;
 					size_type old_capacity = capacity();
 					_start = _alloc.allocate(n);
@@ -169,7 +182,14 @@ namespace ft
 				insert(end(), n, val);
 			}
 
-			void push_back(const value_type & val) { insert(end(), val); }
+			void push_back(const value_type & val)
+			{
+				iterator end = this->end();
+				std::cout << "In push_back, iterator end.base() = " << end.base() << "\n";
+				insert(end, val);
+				//insert(end(), val);
+			}
+
 			void pop_back() { erase(--end()); }
 
 			iterator insert(iterator pos, const value_type & val)
@@ -177,26 +197,63 @@ namespace ft
 
 			void insert(iterator position, size_type n, const value_type & val)
 			{
-				if (size() + n > capacity())
+				std::cout << "In insert, position.base() = " << position.base() << "\n";
+
+				size_type newsize = size() + n;
+				if (newsize > capacity()) { std::cout << "COUCOU\n"; reserve(newsize); }
+				if (empty())
 				{
-					pointer old_start = _start, old_end = _end;
-					size_type old_size = size(), old_capacity = capacity();
-					_start = _alloc.allocate(old_size + n);
-					_end = _start; _memend = _start + old_size + n;
-					pointer tmp;
-					while (old_start != old_end)
+					std::cout << "IN EMPTY\n";
+					size_type i = 0;
+					while (i < n)
 					{
-						if (old_start == position.base())
-						{
-							while (n-- > 0) { _alloc.construct(_end++, val); }
-						}
-						tmp = old_start++;
-						_alloc.construct(_end++, *tmp);
-						_alloc.destroy(tmp);
+						std::cout << "lala\n";
+						_alloc.construct(_start + i, val); i++;
 					}
-					_alloc.deallocate(old_start, old_capacity);
+					_end = _start + n;
+					std::cout << "Updated _end to " << _end << "\n";
+					std::cout << "_start = " << _start << "\n";
+				}
+				else
+				{
+					pointer old_end = _end; _end += n; pointer pos = position.base();
+					std::cout << "old_end = " << old_end << "\n";
+					std::cout << "position.base() = " << pos << "\n";
+					std::cout << "_start = " << _start << "\n";
+					std::cout << "_end = " << _end << "\n";
+					std::cout << "end().base() = " << end().base() << "\n";
+					while (old_end != pos)
+					{
+						std::cout << old_end << " ";
+						old_end--;
+					}
 				}
 			}
+
+//	if (size() + n > capacity())
+//	{
+//		pointer old_start = _start, old_end = _end;
+//		size_type old_size = size(), old_capacity = capacity();
+//		_start = _alloc.allocate(old_size + n);
+//		_end = _start; _memend = _start + old_size + n;
+//		pointer tmp;
+//		while (old_start != old_end)
+//		{
+//			if (old_start == position.base())
+//			{
+//				while (n-- > 0) { _alloc.construct(_end++, val); }
+//			}
+//			tmp = old_start++;
+//			_alloc.construct(_end++, *tmp);
+//			_alloc.destroy(tmp);
+//		}
+//		_alloc.deallocate(old_start, old_capacity);
+//	}
+//	else
+//	{
+//		size_type len_til_pos = &(*position) - _start;
+//		for (
+//	}
 
 			template <class InputIterator>
 			void insert(iterator position, InputIterator first, InputIterator last,
