@@ -118,13 +118,9 @@ namespace ft
 				if (n > max_size()) { throw (std::length_error("vector::reserve")); }
 				else if (n > capacity())
 				{
-
-					// fix reserve
-
 					pointer old_start = _start, old_end = _end;
-					size_type old_capacity = capacity();
-					_start = _alloc.allocate(n);
-					_end = _start; _memend =  _start + n;
+					size_type old_cap = capacity();
+					_start = _alloc.allocate(n); _end = _start; _memend = _start + n;
 					pointer swap, itr = old_start;
 					while (itr != old_end)
 					{
@@ -132,8 +128,15 @@ namespace ft
 						_alloc.construct(_end++, *swap);
 						_alloc.destroy(swap);
 					}
-					_alloc.deallocate(old_start, old_capacity);
+					_alloc.deallocate(old_start, old_cap);
 				}
+				std::cout << "AFTER RESERVE" << "\n";
+				pointer ptr = _start;
+				while (ptr != _end)
+				{
+					std::cout << *ptr << ", "; ptr++;
+				}
+				std::cout << "\n";
 			}
 
 			void resize(size_type n, value_type val = value_type())
@@ -197,10 +200,20 @@ namespace ft
 
 			void insert(iterator position, size_type n, const value_type & val)
 			{
-				std::cout << "In insert, position.base() = " << position.base() << "\n";
-
+				std::cout << "In insert, position.base() = " << position.base() 
+							<< "_start = " << _start << "_end = " << _end << "\n";
+				int dist_to_pos = &*position - _start;
+				std::cout << "dist_to_pos = " << dist_to_pos << "\n";
 				size_type newsize = size() + n;
-				if (newsize > capacity()) { std::cout << "COUCOU\n"; reserve(newsize); }
+				pointer pos = &*position;
+				if (newsize > capacity())
+				{
+					std::cout << "COUCOU\n"; reserve(newsize);
+					std::cout << "AFTER RESERVE position.base() = " << position.base() 
+							<< "_start = " << _start << "_end = " << _end << "\n";
+					pos = _start + dist_to_pos;
+					std::cout << "AFTER UPDATE, pos = " << pos << "\n";
+				}
 				if (empty())
 				{
 					std::cout << "IN EMPTY\n";
@@ -216,17 +229,33 @@ namespace ft
 				}
 				else
 				{
-					pointer old_end = _end; _end += n; pointer pos = position.base();
-					std::cout << "old_end = " << old_end << "\n";
-					std::cout << "position.base() = " << pos << "\n";
-					std::cout << "_start = " << _start << "\n";
-					std::cout << "_end = " << _end << "\n";
-					std::cout << "end().base() = " << end().base() << "\n";
-					while (old_end != pos)
+					pointer old_end = _end; _end += n; pointer ptr = _end;
+					if (old_end != pos)
 					{
-						std::cout << old_end << " ";
-						old_end--;
+						while (--old_end != pos)
+						{
+							std::cout << "old_end = " << old_end << "\n";
+							*(--ptr) = *old_end; _alloc.destroy(old_end);
+						}
 					}
+					ptr = pos;
+					while (n--)
+					{
+						std::cout << "lele\n";
+						_alloc.construct(ptr++, val);
+					}
+
+//					pointer old_end = _end; _end += n; 
+//					std::cout << "old_end = " << old_end << "\n";
+//					std::cout << "position.base() = " << pos << "\n";
+//					std::cout << "_start = " << _start << "\n";
+//					std::cout << "_end = " << _end << "\n";
+//					std::cout << "end().base() = " << end().base() << "\n";
+//					while (old_end != pos)
+//					{
+//						std::cout << old_end << " ";
+//						old_end--;
+//					}
 				}
 			}
 
