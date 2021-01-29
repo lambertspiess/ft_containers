@@ -150,6 +150,7 @@ namespace ft
 			{
 				pointer ptr = _start;
 				while (ptr != _end) { _alloc.destroy(ptr++); }
+				_start = nullptr; _end = nullptr;
 			}
 
 			reference operator[] (size_type n) { return(_start[n]); }
@@ -175,13 +176,14 @@ namespace ft
 									!ft::is_integral<InputIterator>::value, InputIterator
 											>::type * = nullptr)
 			{
-				clear();
-				while (first != last) { insert(_end++, 1, (*first)++); }
+				// deal with assign
+				size_type n = ft::distance(first, last);
+				vector 
 			}
 
 			void assign(size_type n, const value_type & val)
 			{
-				clear(); if (capacity() < n) { reserve(n); }
+				clear();
 				insert(end(), n, val);
 			}
 
@@ -233,9 +235,10 @@ namespace ft
 					pointer old_end = _end; _end += n; pointer ptr = _end;
 					if (old_end != pos)
 					{
-						while (--old_end != pos)
+						while (old_end-- != pos)
 						{
 //							std::cout << "old_end = " << old_end << "\n";
+//							std::cout << "*old_end = " << *old_end << "\n";
 							*(--ptr) = *old_end; _alloc.destroy(old_end);
 						}
 					}
@@ -254,6 +257,7 @@ namespace ft
 									!ft::is_integral<InputIterator>::value, InputIterator
 								>::type * = nullptr)
 			{
+				std::cout << "sfsg2\n";
 				size_type n = distance(first, last);
 				size_type newsize = size() + n;
 				pointer pos = &*position;
@@ -265,9 +269,12 @@ namespace ft
 				}
 				if (empty())
 				{
+					std::cout << "sfsg3\n";
 					size_type i = 0;
 					while (i < n)
 					{
+						std::cout << "sfsg4\n";
+						std::cout << "*first = " << *first << "\n";
 						_alloc.construct(_start + i, *first); i++; first++;
 					}
 					_end = _start + n;
@@ -277,7 +284,7 @@ namespace ft
 					pointer old_end = _end; _end += n; pointer ptr = _end;
 					if (old_end != pos)
 					{
-						while (--old_end != pos)
+						while (old_end-- != pos)
 						{
 							*(--ptr) = *old_end; _alloc.destroy(old_end);
 						}
