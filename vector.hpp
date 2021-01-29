@@ -94,7 +94,7 @@ namespace ft
 
 			iterator end()
 			{
-				std::cout << "In end(), _end = " << _end << "\n";
+//				std::cout << "In end(), _end = " << _end << "\n";
 				return (_end);
 			}
 
@@ -130,13 +130,13 @@ namespace ft
 					}
 					_alloc.deallocate(old_start, old_cap);
 				}
-				std::cout << "AFTER RESERVE" << "\n";
-				pointer ptr = _start;
-				while (ptr != _end)
-				{
-					std::cout << *ptr << ", "; ptr++;
-				}
-				std::cout << "\n";
+//				std::cout << "AFTER RESERVE" << "\n";
+//				pointer ptr = _start;
+//				while (ptr != _end)
+//				{
+//					std::cout << *ptr << ", "; ptr++;
+//				}
+//				std::cout << "\n";
 			}
 
 			void resize(size_type n, value_type val = value_type())
@@ -187,10 +187,10 @@ namespace ft
 
 			void push_back(const value_type & val)
 			{
-				iterator end = this->end();
-				std::cout << "In push_back, iterator end.base() = " << end.base() << "\n";
-				insert(end, val);
-				//insert(end(), val);
+//				iterator end = this->end();
+//				std::cout << "In push_back, iterator end.base() = " << end.base() << "\n";
+//				insert(end, val);
+				insert(end(), val);
 			}
 
 			void pop_back() { erase(--end()); }
@@ -200,32 +200,33 @@ namespace ft
 
 			void insert(iterator position, size_type n, const value_type & val)
 			{
-				std::cout << "In insert, position.base() = " << position.base() 
-							<< "_start = " << _start << "_end = " << _end << "\n";
+//				std::cout << "In insert, position.base() = " << position.base() 
+//							<< "_start = " << _start << "_end = " << _end << "\n";
 				int dist_to_pos = &*position - _start;
-				std::cout << "dist_to_pos = " << dist_to_pos << "\n";
+//				std::cout << "dist_to_pos = " << dist_to_pos << "\n";
 				size_type newsize = size() + n;
 				pointer pos = &*position;
 				if (newsize > capacity())
 				{
-					std::cout << "COUCOU\n"; reserve(newsize);
-					std::cout << "AFTER RESERVE position.base() = " << position.base() 
-							<< "_start = " << _start << "_end = " << _end << "\n";
+					reserve(newsize);
+//					std::cout << "COUCOU\n"; 
+//					std::cout << "AFTER RESERVE position.base() = " << position.base() 
+//							<< "_start = " << _start << "_end = " << _end << "\n";
 					pos = _start + dist_to_pos;
-					std::cout << "AFTER UPDATE, pos = " << pos << "\n";
+//					std::cout << "AFTER UPDATE, pos = " << pos << "\n";
 				}
 				if (empty())
 				{
-					std::cout << "IN EMPTY\n";
+//					std::cout << "IN EMPTY\n";
 					size_type i = 0;
 					while (i < n)
 					{
-						std::cout << "lala\n";
+//						std::cout << "lala\n";
 						_alloc.construct(_start + i, val); i++;
 					}
 					_end = _start + n;
-					std::cout << "Updated _end to " << _end << "\n";
-					std::cout << "_start = " << _start << "\n";
+//					std::cout << "Updated _end to " << _end << "\n";
+//					std::cout << "_start = " << _start << "\n";
 				}
 				else
 				{
@@ -234,14 +235,14 @@ namespace ft
 					{
 						while (--old_end != pos)
 						{
-							std::cout << "old_end = " << old_end << "\n";
+//							std::cout << "old_end = " << old_end << "\n";
 							*(--ptr) = *old_end; _alloc.destroy(old_end);
 						}
 					}
 					ptr = pos;
 					while (n--)
 					{
-						std::cout << "lele\n";
+//						std::cout << "lele\n";
 						_alloc.construct(ptr++, val);
 					}
 

@@ -23,8 +23,8 @@ int main(void)
 	ft::vector<int> ftBase;
 	std::vector<int> stdBase;
 	for (int i = 0; i < 3; ++i) {
-		print(ftBase);
 		ftBase.push_back(i);
+		print(ftBase);
 	}
 	for (int i = 0; i < 3; ++i) {
 		stdBase.push_back(i);
