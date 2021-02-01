@@ -146,12 +146,7 @@ namespace ft
 				if (cur < n) { insert(end(), n - cur, val); }
 			}
 
-			void clear()
-			{
-				pointer ptr = _start;
-				while (ptr != _end) { _alloc.destroy(ptr++); }
-				_start = nullptr; _end = nullptr;
-			}
+			void clear() { erase(begin(), end()); }
 
 			reference operator[] (size_type n) { return(_start[n]); }
 			const_reference operator[] (size_type n) const { return(_start[n]); }
@@ -170,30 +165,25 @@ namespace ft
 			reference back() { return (*--end()); }
 			const_reference back() const { return (*--end()); }
 
+			// handle assign
 			template <class InputIterator>
 			void assign(InputIterator first, InputIterator last,
 						typename ft::enable_if<
-									!ft::is_integral<InputIterator>::value, InputIterator
+								!ft::is_integral<InputIterator>::value, InputIterator
 											>::type * = nullptr)
 			{
-				// deal with assign
-				size_type n = ft::distance(first, last);
-				vector 
+				clear();
+				int i = 0;
+				while (first != last)
+				{
+					insert(begin() + i, 1, *first); ++i; ++first;
+				}
 			}
 
 			void assign(size_type n, const value_type & val)
-			{
-				clear();
-				insert(end(), n, val);
-			}
+				{ clear(); insert(end(), n, val); }
 
-			void push_back(const value_type & val)
-			{
-//				iterator end = this->end();
-//				std::cout << "In push_back, iterator end.base() = " << end.base() << "\n";
-//				insert(end, val);
-				insert(end(), val);
-			}
+			void push_back(const value_type & val) { insert(end(), val); }
 
 			void pop_back() { erase(--end()); }
 
@@ -202,33 +192,20 @@ namespace ft
 
 			void insert(iterator position, size_type n, const value_type & val)
 			{
-//				std::cout << "In insert, position.base() = " << position.base() 
-//							<< "_start = " << _start << "_end = " << _end << "\n";
 				int dist_to_pos = &*position - _start;
-//				std::cout << "dist_to_pos = " << dist_to_pos << "\n";
 				size_type newsize = size() + n;
 				pointer pos = &*position;
 				if (newsize > capacity())
 				{
 					reserve(newsize);
-//					std::cout << "COUCOU\n"; 
-//					std::cout << "AFTER RESERVE position.base() = " << position.base() 
-//							<< "_start = " << _start << "_end = " << _end << "\n";
 					pos = _start + dist_to_pos;
-//					std::cout << "AFTER UPDATE, pos = " << pos << "\n";
 				}
 				if (empty())
 				{
-//					std::cout << "IN EMPTY\n";
 					size_type i = 0;
 					while (i < n)
-					{
-//						std::cout << "lala\n";
-						_alloc.construct(_start + i, val); i++;
-					}
+						{ _alloc.construct(_start + i, val); i++; }
 					_end = _start + n;
-//					std::cout << "Updated _end to " << _end << "\n";
-//					std::cout << "_start = " << _start << "\n";
 				}
 				else
 				{
@@ -236,18 +213,11 @@ namespace ft
 					if (old_end != pos)
 					{
 						while (old_end-- != pos)
-						{
-//							std::cout << "old_end = " << old_end << "\n";
-//							std::cout << "*old_end = " << *old_end << "\n";
-							*(--ptr) = *old_end; _alloc.destroy(old_end);
-						}
+							{ *(--ptr) = *old_end; _alloc.destroy(old_end); }
 					}
 					ptr = pos;
 					while (n--)
-					{
-//						std::cout << "lele\n";
-						_alloc.construct(ptr++, val);
-					}
+						{ _alloc.construct(ptr++, val); }
 				}
 			}
 
@@ -257,24 +227,19 @@ namespace ft
 									!ft::is_integral<InputIterator>::value, InputIterator
 								>::type * = nullptr)
 			{
-				std::cout << "sfsg2\n";
 				size_type n = distance(first, last);
 				size_type newsize = size() + n;
 				pointer pos = &*position;
 				int dist_to_pos = pos - _start;
 				if (newsize > capacity())
 				{
-					reserve(newsize);
-					pos = _start + dist_to_pos;
+					reserve(newsize); pos = _start + dist_to_pos;
 				}
 				if (empty())
 				{
-					std::cout << "sfsg3\n";
 					size_type i = 0;
 					while (i < n)
 					{
-						std::cout << "sfsg4\n";
-						std::cout << "*first = " << *first << "\n";
 						_alloc.construct(_start + i, *first); i++; first++;
 					}
 					_end = _start + n;
@@ -302,17 +267,20 @@ namespace ft
 			iterator erase(iterator first, iterator last)
 			{
 				iterator itr = first, tmp;
-				while (itr != last) { tmp = itr++; _alloc.destroy(tmp.base()); }
-				if (last != end())
+				size_type diff = ft::distance(first, last);
+				while (itr != last)
 				{
-					iterator old_end = end(); _end = first.base();
-					while (last != old_end)
-					{
-						tmp = last++;
-						_alloc.construct(_end++, *tmp);
-						_alloc.destroy(tmp.base());
-					}
+					tmp = itr; ++itr;
+					_alloc.destroy(tmp.base());
 				}
+				while (last != end())
+				{
+					itr = first;
+					_alloc.construct(itr.base(), *last);
+					_alloc.destroy(last.base());
+					++itr; ++last;
+				}
+				_end -= diff;
 				return (first);
 			}
 

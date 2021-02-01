@@ -29,46 +29,31 @@ int main(void)
 		stdBase.push_back(i);
 	}
 
-//	{
-//		ft::vector<int> test;
-//		blue("ft::vector<int> test");
-//		print(test);
-//
-//		test.insert(test.end(), *(stdBase.end()));
-//		blue("test.insert(test.end(), *(stdBase.end()))");
-//		print(test);
-//
-//		test.push_back(42);
-//		blue("test.push_back(42)");
-//		print(test);
-//	}
-
-
-//	{
-//		title("default constructor test");
-//		red("myvector");
-//		ft::vector<int> test;
-//		print(test);
-//	}
-//	{
-//		title("fill constructor test");
-//		blue("my(10, 123)");
-//		ft::vector<int> my(10, 123);
-//		print(my);
-//		yellow("ori(10, 123)");
-//		std::vector<int> ori(10, 123);
-//		print(ori);
-//
-//		title("range constructor test");
-//		blue("my2(my.begin(), my.begin() + 5)");
-//		ft::vector<int> my2(my.begin(), my.begin() + 5);
-//		print(my2);
-//
-//		yellow("ori2(ori.begin(), ori.begin() + 5;)");
-//		std::vector<int> ori2(ori.begin(), ori.begin() + 5);
-//		print(ori2);
-//	}
 	{
+		title("default constructor test");
+		red("myvector");
+		ft::vector<int> test;
+		print(test);
+	}
+	{
+		title("fill constructor test");
+		blue("my(10, 123)");
+		ft::vector<int> my(10, 123);
+		print(my);
+		yellow("ori(10, 123)");
+		std::vector<int> ori(10, 123);
+		print(ori);
+
+		title("range constructor test");
+		blue("my2(my.begin(), my.begin() + 5)");
+		ft::vector<int> my2(my.begin(), my.begin() + 5);
+		print(my2);
+
+		yellow("ori2(ori.begin(), ori.begin() + 5;)");
+		std::vector<int> ori2(ori.begin(), ori.begin() + 5);
+		print(ori2);
+	}
+  {
 		title("copy constructor test");
 		blue("ftBase");
 		print(ftBase);
@@ -92,7 +77,7 @@ int main(void)
 
 		title("max size");
 		std::cout << "ft::vector : " << my.max_size() << std::endl;
-		std::cout << "std::vector : " << ori.max_size() << std::endl;
+		std::cout << "td::vector : " << ori.max_size() << std::endl;
 
 		title("reserve test");
 		blue("my.reserve(100)");
@@ -161,91 +146,107 @@ int main(void)
 		
 		title("pop_back test");
 		blue("my.pop_back 10 times");
+		print(my);
 		for (int i = 0; i < 10; i++)
 			my.pop_back();
 		print(my);
 
 		yellow("ori.pop_back 10 times");
+		print(ori);
 		for (int i = 0; i < 10; i++)
 			ori.pop_back();
 		print(ori);
 
-
 		title("range assign test");
-		std::vector<int> ori2;
-		blue("ori2");
-		for (int i = 0; i < 10; i++)
-			ori2.push_back(i);
-		ori2.assign(ori.begin(), ori.end());
-		print(ori2);
-
 		ft::vector<int> my2;
 		blue("my2");
 		for (int i = 0; i < 10; i++)
 			my2.push_back(i);
+		print(my);
 		print(my2);
 		blue("my2.assign(my.begin(), my.end())");
 		my2.assign(my.begin(), my.end());
 		print(my2);
 
+		std::vector<int> ori2;
+		blue("ori2");
+		for (int i = 0; i < 10; i++)
+			ori2.push_back(i);
+		print(ori);
+		print(ori2);
+		ori2.assign(ori.begin(), ori.end());
+		print(ori2);
 
-//		title("fill assign test");
-//		ft::vector<int> my3;
-//		blue("my3");
-//		for (int i = 0; i < 10; i++)
-//			my3.push_back(i);
-//		print(my3);
-//		blue("my3.assign(10, 0)");
-//		my3.assign(10, 0);
-//		print(my3);
-//
-//		std::vector<int> ori3;
-//		blue("ori3");
-//		for (int i = 0; i < 10; i++)
-//			ori3.push_back(i);
-//		ori3.assign(10, 0);
-//		print(ori3);
-//
-//		title("erase test");
-//		blue("my2.erase(my2.begin(), my2.begin() + 3)");
-//		print(my2);
-//		my2.erase(my2.begin(), my2.begin() + 3);
-//		print(my2);
-//
-//		yellow("ori2.erase(ori2.begin(), ori2.begin() + 3)");
-//		print(ori2);
-//		ori2.erase(ori2.begin(), ori2.begin() + 3);
-//		print(ori2);
+		title("range self assign test");
+		blue("my2");
+		print(my2);
+		blue("my2.assign(my2.begin(), my2.end())");
+		my2.assign(my2.begin(), my2.end());
+		print(my2);
+
+		blue("ori2");
+		print(ori2);
+		ori2.assign(ori2.begin(), ori2.end());
+		print(ori2);
+
+		title("fill assign test");
+		ft::vector<int> my3;
+		blue("my3");
+		for (int i = 0; i < 10; i++)
+			my3.push_back(i);
+		print(my3);
+		blue("my3.assign(10, 0)");
+		my3.assign(10, 0);
+		print(my3);
+
+		std::vector<int> ori3;
+		blue("ori3");
+		for (int i = 0; i < 10; i++)
+			ori3.push_back(i);
+		print(ori3);
+		ori3.assign(10, 0);
+		print(ori3);
+
+		title("erase test");
+		blue("my2.erase(my2.begin(), my2.begin() + 3)");
+		print(my2);
+		my2.erase(my2.begin(), my2.begin() + 3);
+		print(my2);
+
+		yellow("ori2.erase(ori2.begin(), ori2.begin() + 3)");
+		print(ori2);
+		ori2.erase(ori2.begin(), ori2.begin() + 3);
+		print(ori2);
 
 
-//		title("swap test");
-//		blue("my2");
-//		print(my2);
-//		blue("my3");
-//		print(my3);
-//		swap(my2, my3);
-//		blue("my2");
-//		print(my2);
-//		blue("my3");
-//		print(my3);
-//
-//		yellow("ori2");
-//		print(ori2);
-//		yellow("ori3");
-//		print(ori3);
-//		swap(ori2, ori3);
-//		yellow("ori2");
-//		print(ori2);
-//		yellow("ori3");
-//		print(ori3);
-//
-//		title("clear test");
-//		blue("my.clear()");
-//		my.clear();
-//		print(my);
-//		
-//		yellow("ori.clear()");
-//		ori.clear();
-//		print(ori);
+		title("swap test");
+		blue("my2");
+		print(my2);
+		blue("my3");
+		print(my3);
+		swap(my2, my3);
+		blue("my2");
+		print(my2);
+		blue("my3");
+		print(my3);
+
+		yellow("ori2");
+		print(ori2);
+		yellow("ori3");
+		print(ori3);
+		swap(ori2, ori3);
+		yellow("ori2");
+		print(ori2);
+		yellow("ori3");
+		print(ori3);
+
+		title("clear test");
+		blue("my.clear()");
+		my.clear();
+		print(my);
+		
+		yellow("ori.clear()");
+		ori.clear();
+		print(ori);
 	}
 }
