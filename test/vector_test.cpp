@@ -159,10 +159,11 @@ int main(void)
 
 		title("range assign test");
 		ft::vector<int> my2;
-		blue("my2");
 		for (int i = 0; i < 10; i++)
 			my2.push_back(i);
+		blue("my");
 		print(my);
+		blue("my2");
 		print(my2);
 		blue("my2.assign(my.begin(), my.end())");
 		my2.assign(my.begin(), my.end());
@@ -172,7 +173,9 @@ int main(void)
 		blue("ori2");
 		for (int i = 0; i < 10; i++)
 			ori2.push_back(i);
+		yellow("ori");
 		print(ori);
+		yellow("ori2");
 		print(ori2);
 		ori2.assign(ori.begin(), ori.end());
 		print(ori2);
