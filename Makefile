@@ -10,6 +10,7 @@ INCLUDES += enable_if.hpp.hpp
 INCLUDES += list.hpp
 INCLUDES += random_access_iterator.hpp
 INCLUDES += vector.hpp
+INCLUDES += bst.hpp
 
 SRCS	= $(addprefix ./test/, $(addsuffix _test.cpp, $(NAME)) test.cpp)
 
