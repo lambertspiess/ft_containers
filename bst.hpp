@@ -72,10 +72,15 @@ namespace ft
 			reference operator*() const { return (_node->value); }
 			reference operator->() const { return (&(_node->value)); }
 
+			// the mistery of the self pointing node. Lastnode seems to be init
 			bst_iterator & operator++(void)
 			{
 				T * head = _node;
-
+				if (head->right != nullptr) { return (head->right); }
+				else
+				{
+					head = head->parent;
+				}
 			}
 
 
