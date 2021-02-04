@@ -2,11 +2,11 @@
 # define BINARY_SEARCH_TREE_HPP
 
 # include "iterators.hpp"
-# include <cstddef>
-# include <limits>
 # include <sstream>
 # include <typeinfo>
 # include <iostream>
+# include <cstddef>
+# include <limits>
 
 namespace ft
 {
@@ -95,6 +95,31 @@ namespace ft
 //			}
 //	}; // bst_iterator
 
+	template <typename T1, typename T2>
+	struct pair // a pair of objects
+	{
+		typedef T1 first_type; typedef T2 second_type; T1 first; T2 second;
+
+		pair() : first(), second() {}
+		~pair() {}
+		pair(const T1 & first, const T2 & second) : first(first), second(second) {}
+		pair(const pair &other) : first(other.first), second(other.second) {}
+		// this ctor works with iterator types
+		template <typename A, typename B>
+		pair(const pair<A, B> & ptr) : first(ptr.first), second(ptr.second) {}
+		pair & operator=(const pair & other) {
+			if (*this == other) { return (*this); }
+			first = other.first; second = other.second;  return (*this);
+		}
+	}; // struct pair
+
+	template <typename T1, typename T2>
+	pair<T1, T2> make_pair(const T1 t1, const T2 t2)
+		{ return (pair<T1, T2>(t1, t2)); }
+
+	template <typename T1, typename T2>
+	bool operator==(const ft::pair<T1, T2> & lhs, const ft::pair<T1, T2> & rhs)
+		{ return (lhs.first == rhs.first && lhs.second == rhs.second); }
 
 	template <typename T>
 	struct bst_node // a standard binary tree node
@@ -347,9 +372,24 @@ namespace ft
 			Node									*_root;
 			Node									*_init;
 			bst() {};
-			void deep_free(Node * root);
+
+			void deep_free(Node * root)
+			{
+				if (root == NULL) { return ; }
+				deep_free(root->left); deep_free(root->right);
+				_node_alloc.deallocate(root, 1);
+			}
+
 			// Given a node start, create a deep copy of the subtree
-			Node *deep_copy(Node *parent, Node *start);
+			Node *deep_copy(Node *parent, Node *src)
+			{
+				if (start == NULL) { return (NULL); }
+				Node * newnode = _node_alloc.allocate(1);
+				_node_alloc.construct(newnode, Node(src->elem, parent, NULL, NULL));
+				newnode->left = deep_copy(newnode, start->left);
+				newnode->right = deep_copy(newnode, start->right);
+				return (newnode);
+			}
 
 		public:
 			Node * getRoot() { return (_root); }
@@ -358,9 +398,56 @@ namespace ft
 			bst(Compare comp) : _comp(comp), _root(NULL)
 			{
 				_init = _node_alloc.allocate(1);
+				_node_alloc.construct(_init, Node(T(), NULL, NULL, NULL));
+			}
+
+			bst(const bst & other)
+			: _comp(other._comp)
+			{
+				_root = deep_copy(NULL, other._root);
+				_init = _node_alloc.allocate(1);
 				_node_alloc.construct(_init, Node(T(),  NULL, NULL, NULL));
 			}
+
+			bst & operator=(const bst & other)
+			{
+				deep_free(_root);
+				_root = deep_copy(NULL, other._root); _comp = other._comp;
+				return (*this);
+			}
+
+			virtual ~bst() { deep_free(_root); _node_alloc.deallocate(_init, 1); }
+
+			pair<iterator, bool> insert(iterator position, const value_type & val)
+			{
+				Node *newnode, *head = _root;
+				if (_root == NULL)
+				{
+					_root = _node_alloc.allocate(1);
+					_node_alloc.construct(_root, Node(val, NULL, NULL, NULL));
+					return (make_pair(iterator(this, _root), true));
+				}
+				while (1)
+				{
+					// lala do the insert with or without hint. find out
+					// what the true and false values mean for the make_pair
+					if (_comp(val,
+				}
+			}
+
+			bool map_erase(const value_type & val);
 	}; // class bst
+
+//	template <typename T, typename Compare>
+//	void bst<T, Compare>::deep_free(Node * root)
+//	{
+//		if (root == NULL) { return ; }
+//		deep_free(root->left); deep_free(root->right);
+//		_node_alloc.destroy(root); _node_alloc.deallocate(root, 1);
+//	}
+//
+//	template <typename T, typename Compare>
+//	typename bst<T, Compare>::Node * bst<T, Compare>::deep_copy(Node *
 
 }; // namespace ft
 
