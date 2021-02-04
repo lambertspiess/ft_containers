@@ -156,7 +156,7 @@ namespace ft
 				Node *root = this->_tree->getRoot(), *tmp;
 				 // if tree is empty, iterator will point to the init node
 				if (root == NULL) { this->_node = this->_tree->getInit(); return (*this); }
-				// if _node is NULL or past the end, go to the smallest node
+				// if _node is NULL or out of bounds, go to the smallest node
 				if (this->_node == NULL || this->_node == this->_tree->getInit())
 				{
 					this->_node = root;
@@ -171,16 +171,58 @@ namespace ft
 					while (this->_node->left) { this->_node = this->_node->left; }
 					return (*this);
 				}
-				// if _node is a leaf look for the bigger parent
+				// if _node is a leaf look for the closest bigger parent
 				tmp = this->_node->parent;
 				// while the parent is smaller, go up
 				while (tmp != NULL && tmp->right == this->_node)
 					{ this->_node = tmp; tmp = this->_node->parent; }
+				this->_node = tmp;
 				// if we have reached the root, iterator will just point to init
 				if (tmp == NULL) { this->_node = this->_tree.getInit(); }
-				// otherwise return the bigger parent :)
+				// otherwise iterator points to the closest bigger parent
 				return (*this);
 			}
+
+			bst_iterator operator++(int)
+				{ bst_iterator ret(*this); operator++(); return (ret); }
+
+			bst_iterator &operator--(void)
+			{
+				Node *root = this->_tree->getRoot(), *tmp;
+				 // if tree is empty, iterator will point to the init node
+				if (root == NULL) { this->_node = this->_tree->getInit(); return (*this); }
+				// if _node is NULL or out of bounds, go to the biggest node
+				if (this->_node == NULL || this->_node == this->_tree->getInit())
+				{
+					this->_node = root;
+					while (this->_node->right) { this->_node = this->_node->right; }
+					return (*this);
+				}
+				// if there is a subtree on the left...
+				if (this->_node->left != NULL)
+				{
+					// iterator will point to the biggest value in that subtree
+					this->_node = this->_node->left;
+					while (this->_node->right) { this->_node = this->_node->right; }
+					return (*this);
+				}
+				// if _node is a leaf, look for the next smaller parent
+				tmp = this->_node->parent;
+				// while the parent is bigger, go up
+				while (tmp != NULL && tmp->left == this->_node)
+					{ this->_node = tmp; tmp = this->_node->parent; }
+				this->_node = tmp;
+				// if we have reached the root, iterator will just point to init
+				if (tmp == NULL) { this->_node = this->_tree.getInit(); }
+				// otherwise iterator points to the closest smaller parent
+				return (*this);
+			}
+
+			bst_iterator operator--(int)
+				{ bst_iterator ret(*this); operator--(); return (ret); }
+
+			T & operator*() const { return (this->_node->elem); }
+			T & operator->() const { return (&(this->_node->elem)); }
 
 	}; // bst_iterator
 
