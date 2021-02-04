@@ -2,6 +2,11 @@
 # define BINARY_SEARCH_TREE_HPP
 
 # include "iterators.hpp"
+# include <cstddef>
+# include <limits>
+# include <sstream>
+# include <typeinfo>
+# include <iostream>
 
 namespace ft
 {
@@ -332,14 +337,29 @@ namespace ft
 			typedef bst<T, Compare>					Tree;
 			typedef size_t							size_type;
 			typedef bst_iterator<T, Compare>		iterator;
+			typedef bst_const_iterator<T, Compare>	const_iterator;
 			typedef reverse_iterator<iterator>		reverse_iterator;
+			typedef std::allocator<T>				TypeAlloc;
+			typedef std::allocator<Node>			NodeAlloc;
 		private:
+			NodeAlloc								_node_alloc;
 			Compare									_comp;
 			Node									*_root;
 			Node									*_init;
+			bst() {};
+			void deep_free(Node * root);
+			// Given a node start, create a deep copy of the subtree
+			Node *deep_copy(Node *parent, Node *start);
+
 		public:
 			Node * getRoot() { return (_root); }
 			Node * getInit() { return (_init); }
+
+			bst(Compare comp) : _comp(comp), _root(NULL)
+			{
+				_init = _node_alloc.allocate(1);
+				_node_alloc.construct(_init, Node(T(),  NULL, NULL, NULL));
+			}
 	}; // class bst
 
 }; // namespace ft
