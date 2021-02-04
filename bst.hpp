@@ -129,7 +129,6 @@ namespace ft
 	class bst_iterator : public bst_iter<T, Compare>
 	{
 		public:
-//			typedef bst_iterator						iterator;
 			typedef T value_type; typedef T * pointer; typedef T & reference;
 			typedef std::ptrdiff_t						difference_type;
 			typedef ft::bidirectional_iterator_tag		iterator_category;
@@ -223,7 +222,105 @@ namespace ft
 
 			T & operator*() const { return (this->_node->elem); }
 			T & operator->() const { return (&(this->_node->elem)); }
+	}; // bst_iterator
 
+	template <typename T, typename Compare>
+	class bst_const_iterator : public bst_iter<T, Compare>
+	{
+		public:
+			typedef T value_type; typedef T * pointer; typedef T & reference;
+			typedef std::ptrdiff_t						difference_type;
+			typedef ft::bidirectional_iterator_tag		iterator_category;
+			typedef bst<T, Compare>						Tree;
+			typedef bst_node<T>							Node;
+
+			// ctor works by calling the ctor of base class bst_iter
+			bst_const_iterator()
+				: bst_iter<T, Compare>(NULL, NULL) {}
+			bst_const_iterator(Tree * tree)
+				: bst_iter<T, Compare>(tree, NULL) {}
+			bst_const_iterator(Tree * tree, Node * node)
+				: bst_iter<T, Compare>(tree, node) {}
+			bst_const_iterator(const bst_iterator<T, Compare> & other)
+				: bst_iter<T, Compare>(other) {}
+			~bst_const_iterator() {}
+			bst_const_iterator & operator=(const bst_const_iterator & other) {
+				if (*this == other) { return (*this); }
+				this->_node = other._node; this->_tree = other._tree; return (*this);
+			}
+			// increment to the closest bigger node according to Compare
+			bst_const_iterator & operator++(void)
+			{
+				Node *root = this->_tree->getRoot(), *tmp;
+				 // if tree is empty, iterator will point to the init node
+				if (root == NULL) { this->_node = this->_tree->getInit(); return (*this); }
+				// if _node is NULL or out of bounds, go to the smallest node
+				if (this->_node == NULL || this->_node == this->_tree->getInit())
+				{
+					this->_node = root;
+					while (this->_node->left) { this->_node = this->_node->left; }
+					return (*this);
+				}
+				// if there is a subtree on the right...
+				if (this->_node->right != NULL)
+				{
+					// iterator will point to the smallest value in that subtree
+					this->_node = this->_node->right;
+					while (this->_node->left) { this->_node = this->_node->left; }
+					return (*this);
+				}
+				// if _node is a leaf look for the closest bigger parent
+				tmp = this->_node->parent;
+				// while the parent is smaller, go up
+				while (tmp != NULL && tmp->right == this->_node)
+					{ this->_node = tmp; tmp = this->_node->parent; }
+				this->_node = tmp;
+				// if we have reached the root, iterator will just point to init
+				if (tmp == NULL) { this->_node = this->_tree.getInit(); }
+				// otherwise iterator points to the closest bigger parent
+				return (*this);
+			}
+
+			bst_const_iterator operator++(int)
+				{ bst_const_iterator ret(*this); operator++(); return (ret); }
+
+			bst_const_iterator &operator--(void)
+			{
+				Node *root = this->_tree->getRoot(), *tmp;
+				 // if tree is empty, iterator will point to the init node
+				if (root == NULL) { this->_node = this->_tree->getInit(); return (*this); }
+				// if _node is NULL or out of bounds, go to the biggest node
+				if (this->_node == NULL || this->_node == this->_tree->getInit())
+				{
+					this->_node = root;
+					while (this->_node->right) { this->_node = this->_node->right; }
+					return (*this);
+				}
+				// if there is a subtree on the left...
+				if (this->_node->left != NULL)
+				{
+					// iterator will point to the biggest value in that subtree
+					this->_node = this->_node->left;
+					while (this->_node->right) { this->_node = this->_node->right; }
+					return (*this);
+				}
+				// if _node is a leaf, look for the next smaller parent
+				tmp = this->_node->parent;
+				// while the parent is bigger, go up
+				while (tmp != NULL && tmp->left == this->_node)
+					{ this->_node = tmp; tmp = this->_node->parent; }
+				this->_node = tmp;
+				// if we have reached the root, iterator will just point to init
+				if (tmp == NULL) { this->_node = this->_tree.getInit(); }
+				// otherwise iterator points to the closest smaller parent
+				return (*this);
+			}
+
+			bst_const_iterator operator--(int)
+				{ bst_const_iterator ret(*this); operator--(); return (ret); }
+
+			T & operator*() const { return (this->_node->elem); }
+			T & operator->() const { return (&(this->_node->elem)); }
 	}; // bst_iterator
 
 	template <typename T, typename Compare>
