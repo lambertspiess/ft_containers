@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   bst.hpp                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: lspiess <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/02/05 17:45:17 by lspiess           #+#    #+#             */
+/*   Updated: 2021/02/05 19:45:25 by lspiess          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef BINARY_SEARCH_TREE_HPP
 # define BINARY_SEARCH_TREE_HPP
 
@@ -10,91 +22,6 @@
 
 namespace ft
 {
-
-//	template <typename T>
-//	struct bst_node
-//	{
-//		typedef T value_type;	T value;	bst_node *parent, *left, *right;
-//
-//		bst_node() : value(), parent(nullptr), left(nullptr), right(nullptr) {}
-//		bst_node(bst_node * parent = nullptr, bst_node * left = nullptr,
-//												bst_node * right = nullptr)
-//		: value(), parent(parent), left(left), right(right) {}
-//		bst_node(const bst_node & other)
-//		: value(), parent(other.parent), left(other.left), right(other.right) {}
-//		~virtual bst_node() {}
-//		bst_node & operator=(const bst_node & rhs)
-//		{
-//			if (*this == rhs) { return (*this); }
-//			value = rhs.value; parent = rhs.parent; left = rhs.left; right = rhs.right;
-//			return (*this);
-//		}
-//		bool operator==(const bst_node & rhs) { return (value == rhs.value); }
-//	}; // struct bst_node
-//
-//	template <class T, class Compare = ft::less<T>, class Node = ft::bst_node<T>,
-//				class TAlloc = std::allocator<T>, class NodeAlloc = std::allocator<Node> >
-//	class bst
-//	{
-//		public :
-//
-//		typedef bst self; typedef bst & self_reference; typedef T value_type;
-//		typedef Node *											node_pointer;
-//		typedef ft::bst_iterator<Node, Compare>					iterator;
-//		typedef ft::bst_const_iterator<Node, Compare>			const_iterator;
-//		private:
-//			node_pointer _root, _init;
-//
-//		bst(const NodeAlloc * node_alloc
-//	}; // class bst
-//
-//	template <typename T, class Compare>
-//	class bst_iterator : ft::iterator<ft::bidirectional_iterator_tag, T>
-//	{
-//		private:
-//			typedef typename ft::iterator<ft::bidirectional_iterator_tag, T> _iter;
-//		public:
-//			typedef T										value_type;
-//			typedef typename _iter::difference_type			difference_type;
-//			typedef typename _iter::pointer					pointer;
-//			typedef typename _iter::reference				reference;
-//
-//			bst_iterator(const Compare & cmp = Compare())
-//			: _node(), _lastnode(), _cmp(cmp)
-//			{}
-//
-//			bst_iterator(T * node, T * lastnode, const Compare & cmp = Compare())
-//			: _node(node), _lastnode(lastnode), _cmp(cmp)
-//			{}
-//
-//			bst_iterator(const bst_iterator & other)
-//			: _node(other._node), _lastnode(other._lastnode), _cmp(other._cmp)
-//			{}
-//
-//			virtual ~bst_iterator() {}
-//
-//			bst_iterator & operator=(const bst_iterator & rhs)
-//			{
-//				if (*this == rhs) { return (*this); }
-//				_node = rhs._node; _lastnode = rhs._lastnode; _cmp = rhs._cmp;
-//				return (*this);
-//			}
-//
-//			bool operator==(const bst_iterator & rhs)
-//			{ return (_node == rhs._node); }
-//
-//			bool operator!=(const bst_iterator * rhs)
-//			{ return (_node != rhs._node); }
-//
-//			reference operator*() const { return (_node->value); }
-//			reference operator->() const { return (&(_node->value)); }
-//
-//			// the mistery of the self pointing node. Lastnode seems to be init
-//			bst_iterator & operator++(void)
-//			{
-//			}
-//	}; // bst_iterator
-
 	template <typename T1, typename T2>
 	struct pair // a pair of objects
 	{
@@ -200,15 +127,15 @@ namespace ft
 					while (this->_node->left) { this->_node = this->_node->left; }
 					return (*this);
 				}
-				// if _node is a leaf look for the closest bigger parent
-				tmp = this->_node->parent;
-				// while the parent is smaller, go up
-				while (tmp != NULL && tmp->right == this->_node)
-					{ this->_node = tmp; tmp = this->_node->parent; }
-				this->_node = tmp;
-				// if we have reached the root, iterator will just point to init
-				if (tmp == NULL) { this->_node = this->_tree.getInit(); }
-				// otherwise iterator points to the closest bigger parent
+				// this->node is the rightmost node of its branch. Gotta look
+				// for a bigger parent.
+				// While the parent is smaller than the child, go up...
+				while (this->node->parent && this->node->parent->right == this->node)
+					{ this->node = this->node->parent; }
+				// then go to that parent
+				this->node = this->node->parent;
+				// if we haven't found a bigger parent, return init
+				if (this->node == NULL) { this->node = this->_three.getInit(); }
 				return (*this);
 			}
 
@@ -274,10 +201,15 @@ namespace ft
 			bst_const_iterator(const bst_iterator<T, Compare> & other)
 				: bst_iter<T, Compare>(other) {}
 			~bst_const_iterator() {}
+
 			bst_const_iterator & operator=(const bst_const_iterator & other) {
 				if (*this == other) { return (*this); }
 				this->_node = other._node; this->_tree = other._tree; return (*this);
 			}
+
+			T & operator*() const { return (this->_node->elem); }
+			T & operator->() const { return (&(this->_node->elem)); }
+
 			// increment to the closest bigger node according to Compare
 			bst_const_iterator & operator++(void)
 			{
@@ -348,9 +280,6 @@ namespace ft
 
 			bst_const_iterator operator--(int)
 				{ bst_const_iterator ret(*this); operator--(); return (ret); }
-
-			T & operator*() const { return (this->_node->elem); }
-			T & operator->() const { return (&(this->_node->elem)); }
 	}; // bst_iterator
 
 	template <typename T, typename Compare>
@@ -369,25 +298,28 @@ namespace ft
 		private:
 			NodeAlloc								_node_alloc;
 			Compare									_comp;
+			// _root is the first node in the binary tree
 			Node									*_root;
+			// _init represents the past-the-end elem of the container
 			Node									*_init;
 			bst() {};
 
+			// recursively free a tree/subtree starting at root (inclusive)
 			void deep_free(Node * root)
 			{
 				if (root == NULL) { return ; }
 				deep_free(root->left); deep_free(root->right);
-				_node_alloc.deallocate(root, 1);
+				_node_alloc.destroy(root); _node_alloc.deallocate(root, 1);
 			}
 
-			// Given a node start, create a deep copy of the subtree
+			// recursively create a deep copy of a tree/subtree starting at src
 			Node *deep_copy(Node *parent, Node *src)
 			{
-				if (start == NULL) { return (NULL); }
+				if (src == NULL) { return (NULL); }
 				Node * newnode = _node_alloc.allocate(1);
 				_node_alloc.construct(newnode, Node(src->elem, parent, NULL, NULL));
-				newnode->left = deep_copy(newnode, start->left);
-				newnode->right = deep_copy(newnode, start->right);
+				newnode->left = deep_copy(newnode, src->left);
+				newnode->right = deep_copy(newnode, src->right);
 				return (newnode);
 			}
 
@@ -411,6 +343,7 @@ namespace ft
 
 			bst & operator=(const bst & other)
 			{
+				if (*this == other) { return (*this); }
 				deep_free(_root);
 				_root = deep_copy(NULL, other._root); _comp = other._comp;
 				return (*this);
@@ -418,9 +351,15 @@ namespace ft
 
 			virtual ~bst() { deep_free(_root); _node_alloc.deallocate(_init, 1); }
 
-			pair<iterator, bool> insert(iterator position, const value_type & val)
+			// Look for a pre-existing node whose key equals val.first.
+			// If found, return an iterator to that node.
+			// Otherwise create that node and return an iterator to it.
+			pair<iterator, bool> insert(const value_type & val)
 			{
 				Node *newnode, *head = _root;
+				// the returned pair comprises the iterator to the relevant
+				// node and a boolean. That bool is set to true if a new node
+				// had to be created, false if it already existed.
 				if (_root == NULL)
 				{
 					_root = _node_alloc.allocate(1);
@@ -429,25 +368,129 @@ namespace ft
 				}
 				while (1)
 				{
-					// lala do the insert with or without hint. find out
-					// what the true and false values mean for the make_pair
-					if (_comp(val,
+					// if the current node's key is same as our value's key
+					if (head->elem->first == val.first)
+						return (make_pair(iterator(this, head), false));
+					// if val is less than head->elem
+					if (_comp(val, head->elem))
+					{
+						if (head->left != NULL) { head = head->left; }
+						else
+						{
+							newnode = _node_alloc.allocate(1);
+							_node_alloc.construct(newnode, Node(val, head, NULL, NULL));
+							head->left = newnode; break ;
+						}
+					}
+					else
+					{
+						if (head->right != NULL) { head = head->right; }
+						else
+						{
+							newnode = _node_alloc.allocate(1);
+							_node_alloc.construct(newnode, Node(val, head, NULL, NULL));
+							head->right = newnode; break ;
+						}
+					}
 				}
+				return (make_pair(iterator(this, newnode), true));
 			}
 
-			bool map_erase(const value_type & val);
+			pair<iterator, bool> insert(iterator hint, const value_type & val)
+			{ static_cast<void>(hint); return (insert(val)); }
+
+			void insert(iterator first, iterator last)
+			{
+				iterator itr = first; while (itr != last) { insert(*itr); ++itr; }
+			}
+
+			bool remove(const value_type & val)
+			{ return (remove(_root, val)); }
+
+			bool remove(Node * root, const value_type & val)
+			{
+				if (root == NULL) { return (false); } Node * head = root;
+				// go through the tree and find the matching key
+				while (head)
+				{
+					if (head->elem->first == val.first)
+						break ;
+					if (_comp(val, root->elem))
+						head = head->left;
+					else
+						head = head->right;
+				}
+				// if no node with a matching key was not found, return
+				if (head == NULL) { return (false); }
+				// save some info needed to rearrange the tree...
+				Node *leftchild = head->left, *rightchild = head->right;
+				Node *parent = head->parent;
+				bool headside; // the node's position relative to its parent
+				if (parent) { headside = (parent->left == head) ? 0 : 1; }
+				// deleting the node
+				_node_alloc.destroy(head); _node_alloc.deallocate(head, 1);
+				// just zeroing the parent's pointer to the node
+				if (parent) 
+				{
+					if (headside == 0) { parent->left == NULL; }
+					else { parent->right == NULL; }
+				}
+				// if the deleted node was not a leaf, rearrange the tree :
+				Node * substitute; bool subtreeside;
+				if (leftchild)
+					{ substitute = find_max(leftchild);subtreeside = 0; }
+				else if (rightchild)
+					{ substitute = find_min(rightchild); subtreeside = 1; }
+				else // no subtrees means we removed a leaf node
+					return (true); // no repositioning needed
+				if (parent != NULL)
+				{
+					if ( headside == 0)
+						{ parent->left = Node(substitute);  head = parent->left; }
+					else
+						{ parent->right = Node(substitute); head = parent->right; }
+				}
+				else { _root = Node(substitute); head = _root; }
+				head->left = leftchild; head->right = rightchild;
+				// now that we have copied the substitute in the deleted
+				// node's place, we remove the original down in the subtree
+				if (subtreeside == 0)
+					remove(head->left, head->elem);
+				else
+					remove(head->right, head->elem);
+				return (true);
+			}
+
+			Node * find_max(Node * root)
+			{
+				Node * head = root; if (root == NULL) { return NULL; }
+				while (head->right) { head = head->right; }
+				return (head);
+			}
+			Node * find_min(Node * root)
+			{
+				Node * head = root; if (root == NULL) { return NULL; }
+				while (head->left) { head = head->right; }
+				return (head);
+			}
 	}; // class bst
 
-//	template <typename T, typename Compare>
-//	void bst<T, Compare>::deep_free(Node * root)
-//	{
-//		if (root == NULL) { return ; }
-//		deep_free(root->left); deep_free(root->right);
-//		_node_alloc.destroy(root); _node_alloc.deallocate(root, 1);
-//	}
-//
-//	template <typename T, typename Compare>
-//	typename bst<T, Compare>::Node * bst<T, Compare>::deep_copy(Node *
+	template <class T>
+	struct less : std::binary_function<T, T, bool>
+	{
+		bool operator()(const T & x, const T & y) const { return x < y; }
+	}; // struct less
+
+	template <typename Key, typename T, class Compare = ft::less<Key>,
+				class Alloc = std::allocator<pair<const Key, T> > >
+	class map
+	{
+		private:
+			Alloc											_alloc;
+			bst<pair<const Key, T>, // lala
+		public:
+
+	}
 
 }; // namespace ft
 
