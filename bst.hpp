@@ -6,7 +6,7 @@
 /*   By: lspiess <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 17:45:17 by lspiess           #+#    #+#             */
-/*   Updated: 2021/02/06 19:01:04 by lspiess          ###   ########.fr       */
+/*   Updated: 2021/02/06 22:11:27 by lspiess          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -297,7 +297,7 @@ namespace ft
 			typedef std::allocator<Node>			NodeAlloc;
 		private:
 			NodeAlloc								_node_alloc;
-			Compare									_comp;
+			Compare									_cmp;
 			// _root is the first node in the binary tree
 			Node									*_root;
 			// _init represents the past-the-end elem of the container
@@ -327,14 +327,14 @@ namespace ft
 			Node * getRoot() { return (_root); }
 			Node * getInit() { return (_init); }
 
-			bst(Compare comp) : _comp(comp), _root(NULL)
+			bst(Compare comp) : _cmp(comp), _root(NULL)
 			{
 				_init = _node_alloc.allocate(1);
 				_node_alloc.construct(_init, Node(T(), NULL, NULL, NULL));
 			}
 
 			bst(const bst & other)
-			: _comp(other._comp)
+			: _cmp(other._cmp)
 			{
 				_root = deep_copy(NULL, other._root);
 				_init = _node_alloc.allocate(1);
@@ -345,7 +345,7 @@ namespace ft
 			{
 				if (*this == other) { return (*this); }
 				deep_free(_root);
-				_root = deep_copy(NULL, other._root); _comp = other._comp;
+				_root = deep_copy(NULL, other._root); _cmp = other._cmp;
 				return (*this);
 			}
 
@@ -372,7 +372,7 @@ namespace ft
 					if (head->elem->first == val.first)
 						return (make_pair(iterator(this, head), false));
 					// if val is less than head->elem
-					if (_comp(val, head->elem))
+					if (_cmp(val, head->elem))
 					{
 						if (head->left != NULL) { head = head->left; }
 						else
@@ -415,7 +415,7 @@ namespace ft
 				{
 					if (head->elem->first == val.first)
 						break ;
-					if (_comp(val, root->elem))
+					if (_cmp(val, root->elem))
 						head = head->left;
 					else
 						head = head->right;
@@ -482,30 +482,55 @@ namespace ft
 	}; // struct less
 
 	template <typename Key, typename T, class Compare = ft::less<Key>,
-				class Alloc = std::allocator<pair<const Key, T> > >
+				class A = std::allocator<pair<const Key, T> > >
 	class map
 	{
 		public:
-			typedef T mapped_type; typedef Key key_type; typedef Compare key_compare;
+			typedef Key key_type; typedef T mapped_type;
+			typedef Compare key_compare; typedef A allocator_type;
 			typedef pair<const Key, T>						value_type;
 
+			// this is just a wrapper to compare two pairs of Key - T.
+			// Works by calling Compare on the two keys.
 			class value_compare
 			{
 				private:
-					Compare _comp;
+					Compare comp;
 					value_compare() {}
 				public:
-					typedef pair<const Key, T> first_argument_type;
-					typedef pair<const Key, T> second_argument_type;;
-					~value_compare() {}
-					//
+					typedef pair<const Key, T>			first_argument_type;
+					typedef pair<const Key, T>			second_argument_type;;
+					value_compare(const Compare & c) : comp(c.comp) {}
+					bool operator() (const value_type & x, const value_type & y) const
+					{ return (comp(x.first, y.first)); }
 			}; // class value_compare
+
+			typedef std::ptrdiff_t						difference_type;
+			typedef size_t								size_type;
+			typedef typename bst<value_type, value_compare>::iterator
+														iterator;
+			typedef typename bst<value_type, value_compare>::const_iterator
+														const_iterator;
+			typedef typename bst<value_type, value_compare>::reverse_iterator
+														reverse_iterator;
+			typedef typename bst<value_type, value_compare>::const_reverse_iterator
+														const_reverse_iterator;
+			typedef bst_node< pair<const Key, T> >	Node;
+
 		private:
 			Alloc											_alloc;
-			bst<pair<const Key, T>, // lala
+			bst< pair<const Key, T>, value_compare>			_tree;
 		public:
-			
-	}
+			// create a map with no elements
+			explicit map(const key_compare & comp = key_compare(),
+							const allocator_type & a = allocator_type());
+			// create a map consisting of copies of elements from [first, last)
+			template <typename InputIterator>
+			map(InputIterator first, InputIterator last,
+				const key_compare & comp = key_compare(),
+				const allocator_type & alloc = allocator_type());
+// lala
+	}; // class map
 
 }; // namespace ft
 
