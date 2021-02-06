@@ -6,7 +6,7 @@
 /*   By: lspiess <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 17:45:17 by lspiess           #+#    #+#             */
-/*   Updated: 2021/02/05 19:45:25 by lspiess          ###   ########.fr       */
+/*   Updated: 2021/02/06 19:01:04 by lspiess          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -485,11 +485,26 @@ namespace ft
 				class Alloc = std::allocator<pair<const Key, T> > >
 	class map
 	{
+		public:
+			typedef T mapped_type; typedef Key key_type; typedef Compare key_compare;
+			typedef pair<const Key, T>						value_type;
+
+			class value_compare
+			{
+				private:
+					Compare _comp;
+					value_compare() {}
+				public:
+					typedef pair<const Key, T> first_argument_type;
+					typedef pair<const Key, T> second_argument_type;;
+					~value_compare() {}
+					//
+			}; // class value_compare
 		private:
 			Alloc											_alloc;
 			bst<pair<const Key, T>, // lala
 		public:
-
+			
 	}
 
 }; // namespace ft
