@@ -6,7 +6,7 @@
 /*   By: lspiess <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 17:45:17 by lspiess           #+#    #+#             */
-/*   Updated: 2021/02/06 22:11:27 by lspiess          ###   ########.fr       */
+/*   Updated: 2021/02/07 12:18:04 by lspiess          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -490,8 +490,8 @@ namespace ft
 			typedef Compare key_compare; typedef A allocator_type;
 			typedef pair<const Key, T>						value_type;
 
-			// this is just a wrapper to compare two pairs of Key - T.
-			// Works by calling Compare on the two keys.
+			// this is just a wrapper around typename Compare.
+			// Given two pairs, it accesses and compares their keys.
 			class value_compare
 			{
 				private:
@@ -500,7 +500,8 @@ namespace ft
 				public:
 					typedef pair<const Key, T>			first_argument_type;
 					typedef pair<const Key, T>			second_argument_type;;
-					value_compare(const Compare & c) : comp(c.comp) {}
+					value_compare(const Compare & c)
+					: comp(c.comp) {}
 					bool operator() (const value_type & x, const value_type & y) const
 					{ return (comp(x.first, y.first)); }
 			}; // class value_compare
@@ -523,13 +524,24 @@ namespace ft
 		public:
 			// create a map with no elements
 			explicit map(const key_compare & comp = key_compare(),
-							const allocator_type & a = allocator_type());
+						const allocator_type & alloc = allocator_type())
+			: _tree(value_compare(comp)), _alloc(alloc)
+			{}
+
+			// lala
 			// create a map consisting of copies of elements from [first, last)
 			template <typename InputIterator>
 			map(InputIterator first, InputIterator last,
 				const key_compare & comp = key_compare(),
-				const allocator_type & alloc = allocator_type());
-// lala
+				const allocator_type & alloc = allocator_type())
+			: _tree(value_compare(comp)), _alloc(alloc)
+			{
+				InputIterator itr = first;
+				while (itr != last)
+				{
+					_tree.insert(iterator(&_
+				}
+			}
 	}; // class map
 
 }; // namespace ft
