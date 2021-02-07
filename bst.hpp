@@ -6,7 +6,7 @@
 /*   By: lspiess <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 17:45:17 by lspiess           #+#    #+#             */
-/*   Updated: 2021/02/07 12:18:04 by lspiess          ###   ########.fr       */
+/*   Updated: 2021/02/08 00:22:42 by lspiess          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,7 +135,7 @@ namespace ft
 				// then go to that parent
 				this->node = this->node->parent;
 				// if we haven't found a bigger parent, return init
-				if (this->node == NULL) { this->node = this->_three.getInit(); }
+				if (this->node == NULL) { this->node = this->_tree.getInit(); }
 				return (*this);
 			}
 
@@ -352,8 +352,8 @@ namespace ft
 			virtual ~bst() { deep_free(_root); _node_alloc.deallocate(_init, 1); }
 
 			// Look for a pre-existing node whose key equals val.first.
-			// If found, return an iterator to that node.
-			// Otherwise create that node and return an iterator to it.
+			// If not present, create and insert it in the tree.
+			// Return an iterator to that node;
 			pair<iterator, bool> insert(const value_type & val)
 			{
 				Node *newnode, *head = _root;
@@ -473,7 +473,21 @@ namespace ft
 				while (head->left) { head = head->right; }
 				return (head);
 			}
+
+			size_type getTreeSize(Node *node) const
+			{
+				if (node == NULL) { return (0); }
+				return (1 + getTreeSize(node->left) + getTreeSize(node->right));
+			}
+
+			size_type getSize() const
+			{
+				Node * node = _root;
+				return (getTreeSize(node));
+			}
 	}; // class bst
+
+
 
 	template <class T>
 	struct less : std::binary_function<T, T, bool>
@@ -481,17 +495,21 @@ namespace ft
 		bool operator()(const T & x, const T & y) const { return x < y; }
 	}; // struct less
 
+	// Key : type of the key object
+	// T : type of the mapped object
+	// Compare : comparison functor
 	template <typename Key, typename T, class Compare = ft::less<Key>,
-				class A = std::allocator<pair<const Key, T> > >
+				class Alloc = std::allocator<pair<const Key, T> > >
 	class map
 	{
 		public:
 			typedef Key key_type; typedef T mapped_type;
-			typedef Compare key_compare; typedef A allocator_type;
+			typedef Compare key_compare; typedef Alloc allocator_type;
 			typedef pair<const Key, T>						value_type;
 
 			// this is just a wrapper around typename Compare.
-			// Given two pairs, it accesses and compares their keys.
+			// Given two pairs, it accesses and compares their keys to see
+			// which comes before the other.
 			class value_compare
 			{
 				private:
@@ -528,7 +546,6 @@ namespace ft
 			: _tree(value_compare(comp)), _alloc(alloc)
 			{}
 
-			// lala
 			// create a map consisting of copies of elements from [first, last)
 			template <typename InputIterator>
 			map(InputIterator first, InputIterator last,
@@ -536,12 +553,202 @@ namespace ft
 				const allocator_type & alloc = allocator_type())
 			: _tree(value_compare(comp)), _alloc(alloc)
 			{
-				InputIterator itr = first;
-				while (itr != last)
-				{
-					_tree.insert(iterator(&_
-				}
+				_tree.insert(first, last);
 			}
+
+			map(const map & other)
+			: _tree(other._tree), _alloc(other._alloc)
+			{}
+
+			~map() {}
+
+			map & operator=(const map & rhs)
+			{
+				if (*this == rhs) { return (*this); }
+				_tree = rhs._tree; _alloc = rhs._alloc; return (*this);
+			}
+
+			iterator begin()
+			{
+				Node *head = _tree.getroot();
+				if (!head) { return (iterator(&_tree, _tree.getInit())); }
+				while (head->left) { head = head->left; }
+				return (iterator(&_tree, head));
+			}
+			iterator begin() const { Node *head = _tree.getroot();
+				if (!head) { return (const_iterator(&_tree, _tree.getInit())); }
+				while (head->left) { head = head->left; }
+				return (const_iterator(&_tree, head)); }
+
+			iterator end() { return (iterator(&_tree, _tree.getInit())); }
+			iterator end() const { return (const_iterator(&_tree, _tree.getInit())); }
+
+			reverse_iterator rbegin() { return (reverse_iterator(end())); }
+			reverse_iterator rbegin() const { return (reverse_const_iterator(end())); }
+			reverse_iterator rend() { return (reverse_iterator(begin())); }
+			reverse_iterator rend() const { return (reverse_const_iterator(begin())); }
+
+			bool empty() const { return (_tree.getSize() == 0); }
+
+			size_type size() const { return (_tree.getSize()); }
+
+			size_type max_size() const { return (allocator_type().max_size()); }
+
+			// return the value associated with the key k.
+			// If no node holding that key exists, a node with that key is
+			// created using default value which is then returned.
+			T & operator[] (const Key & k)
+			{
+				iterator itr = find(k);
+				if (itr == end())
+				{ itr = _tree.insert(ft::make_pair(k, mapped_type())).first; }
+				return (itr.second);
+			}
+
+			value_type insert(const value_type & val)
+			{ return (_tree.insert(val)); }
+			value_type insert(iterator hint, const value_type & val)
+			{ static_cast<void>(hint); return (_tree.insert(val)); }
+			value_type insert(iterator first, iterator last)
+			{ return (_tree.insert(first, last)); }
+
+			void erase(iterator position) { _tree.remove((*position).first); }
+
+			void erase(const Key k) { _tree.remove(k); }
+
+			void erase(iterator first, iterator last)
+			{
+				while (first != last) { erase((*first).first); ++first; }
+			}
+
+			void swap(map & other)
+			{
+				std::swap(_alloc, other._alloc); std::swap(_tree, other._tree);
+			}
+
+			void clear() { erase(begin(), end()); }
+
+			key_compare key_comp() const { return (key_compare()); }
+
+			value_compare value_comp() const { return (value_compare(key_compare())); }
+
+			iterator find(const key_type & k) 
+			{
+				Node * head = _tree.getRoot();
+				while (head)
+				{
+					if (head->elem->first == k) { return (iterator(&_tree, head)); }
+					if (comp(k, head->elem->first) == true)
+						head = head->left;
+					else
+						head = head->right;
+				}
+				return (iterator(&_tree, end()));
+			}
+
+			const_iterator find(const key_type & k) const {
+				Node * head = _tree.getRoot();
+				while (head) {
+					if (head->elem->first == k) { return (const_iterator(&_tree, head)); }
+					if (comp(k, head->elem->first) == true)
+						head = head->left;
+					else
+						head = head->right;
+				} return (const_iterator(&_tree, end()));
+			}
+
+			// find the number of elements with a given key. This only makes
+			// sense for multimaps, as basic map does not allow doubles.
+			size_type count(const key_type & k)
+			{
+				iterator itr = find(k);
+				if (itr != end()) { return (1); } else { return (0); }
+			}
+
+			// return an iterator to the first element equal to or greater
+			// than key, or end()
+			iterator lower_bound(const key_type & k)
+			{
+				Node *head = _tree.getRoot();
+				while (head)
+				{
+					if (head->value->first == k) { return (iterator(&_tree, head)); }
+					if (cmp(head->value->first, k) == true)
+						head = head->left;
+					else if (head->right)
+					{
+						head = head->right;
+						while (head->left) { head = head->left; }
+						return (iterator(&_tree, head));
+					}
+				}
+				return (iterator(&_tree, end()));
+			}
+			const_iterator lower_bound(const key_type & k) const
+			{
+				Node *head = _tree.getRoot();
+				while (head)
+				{
+					if (head->value->first == k) { return (const_iterator(&_tree, head)); }
+					if (cmp(head->value->first, k) == true)
+						head = head->left;
+					else if (head->right)
+					{
+						head = head->right;
+						while (head->left) { head = head->left; }
+						return (const_iterator(&_tree, head));
+					}
+				}
+				return (const_iterator(&_tree, end()));
+			}
+
+			// return an iterator to the first element equal to or smaller
+			// than key, or end()
+			iterator upper_bound(const key_type & k)
+			{
+				Node *head = _tree.getRoot();
+				while (head)
+				{
+					if (head->value->first == k) { return (iterator(&_tree, head)); }
+					if (cmp(k, head->value->first) == true)
+						head = head->right;
+					else if (head->left)
+					{
+						head = head->left;
+						while (head->right) { head = head->right; }
+						return (iterator(&_tree, head));
+					}
+				}
+				return (iterator(&_tree, end()));
+			}
+			const_iterator upper_bound(const key_type & k) const
+			{
+				Node *head = _tree.getRoot();
+				while (head)
+				{
+					if (head->value->first == k) { return (const_iterator(&_tree, head)); }
+					if (cmp(k, head->value->first) == true)
+						head = head->right;
+					else if (head->left)
+					{
+						head = head->left;
+						while (head->right) { head = head->right; }
+						return (const_iterator(&_tree, head));
+					}
+				}
+				return (const_iterator(&_tree, end()));
+			}
+
+			// return a pair of iterator that possibly point to the subsequence
+			// matching the given key. Again, only makes sense for multimaps.
+			pair<const_iterator, const_iterator> equal_range(const key_type & k) const
+			{ return (ft::make_pair(lower_bound(k), upper_bound(k))); }
+
+			// return a pair of iterator that possibly point to the subsequence
+			// matching the given key. Again, only makes sense for multimaps.
+			pair<iterator, iterator> equal_range(const key_type & k)
+			{ return (ft::make_pair(lower_bound(k), upper_bound(k))); }
+
 	}; // class map
 
 }; // namespace ft
