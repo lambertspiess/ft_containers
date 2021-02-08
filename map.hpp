@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   bst.hpp                                            :+:      :+:    :+:   */
+/*   map.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lspiess <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 17:45:17 by lspiess           #+#    #+#             */
-/*   Updated: 2021/02/08 00:22:42 by lspiess          ###   ########.fr       */
+/*   Updated: 2021/02/08 01:15:18 by lspiess          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 # define BINARY_SEARCH_TREE_HPP
 
 # include "iterators.hpp"
+# include "enable_if.hpp"
+# include "random_access_iterator.hpp"
 # include <sstream>
 # include <typeinfo>
 # include <iostream>
@@ -53,8 +55,9 @@ namespace ft
 	{
 		T elem;		typedef T elem_type;	bst_node *parent, *left, *right;
 		bst_node() {}
-		bst_node(T elem, bst_node parent, bst_node left, bst_node right)
-		: elem(elem), parent(parent), left(left), right(right) {}
+		bst_node(T elem, bst_node *parent, bst_node *left, bst_node *right)
+		: elem(elem), parent(parent), left(left), right(right)
+		{}
 		bst_node(const bst_node & other)
 		: elem(other.elem), parent(other.parent), left(other.left), right(other.right) {}
 	}; // struct bst_node
@@ -286,15 +289,17 @@ namespace ft
 	class bst
 	{
 		public:
-			typedef T								value_type;
-			typedef bst_node<T> 					Node;
-			typedef bst<T, Compare>					Tree;
-			typedef size_t							size_type;
-			typedef bst_iterator<T, Compare>		iterator;
-			typedef bst_const_iterator<T, Compare>	const_iterator;
-			typedef reverse_iterator<iterator>		reverse_iterator;
-			typedef std::allocator<T>				TypeAlloc;
-			typedef std::allocator<Node>			NodeAlloc;
+			typedef T									value_type;
+			typedef bst_node<T> 						Node;
+			typedef bst<T, Compare>						Tree;
+			typedef size_t								size_type;
+			typedef bst_iterator<T, Compare>			iterator;
+			typedef bst_const_iterator<T, Compare>		const_iterator;
+
+			typedef ft::reverse_iterator<iterator>			reverse_iterator;
+			typedef ft::reverse_iterator<const_iterator>	const_reverse_iterator;
+			typedef std::allocator<T>					TypeAlloc;
+			typedef std::allocator<Node>				NodeAlloc;
 		private:
 			NodeAlloc								_node_alloc;
 			Compare									_cmp;
@@ -487,8 +492,6 @@ namespace ft
 			}
 	}; // class bst
 
-
-
 	template <class T>
 	struct less : std::binary_function<T, T, bool>
 	{
@@ -519,7 +522,7 @@ namespace ft
 					typedef pair<const Key, T>			first_argument_type;
 					typedef pair<const Key, T>			second_argument_type;;
 					value_compare(const Compare & c)
-					: comp(c.comp) {}
+					: comp(c) {}
 					bool operator() (const value_type & x, const value_type & y) const
 					{ return (comp(x.first, y.first)); }
 			}; // class value_compare
@@ -534,11 +537,11 @@ namespace ft
 														reverse_iterator;
 			typedef typename bst<value_type, value_compare>::const_reverse_iterator
 														const_reverse_iterator;
-			typedef bst_node< pair<const Key, T> >	Node;
+			typedef bst_node< pair<const Key, T> >		Node;
 
 		private:
-			Alloc											_alloc;
 			bst< pair<const Key, T>, value_compare>			_tree;
+			Alloc											_alloc;
 		public:
 			// create a map with no elements
 			explicit map(const key_compare & comp = key_compare(),
