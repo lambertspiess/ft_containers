@@ -6,7 +6,7 @@
 /*   By: lspiess <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 17:45:17 by lspiess           #+#    #+#             */
-/*   Updated: 2021/02/08 01:15:18 by lspiess          ###   ########.fr       */
+/*   Updated: 2021/02/08 02:22:24 by lspiess          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,15 +27,19 @@ namespace ft
 	template <typename T1, typename T2>
 	struct pair // a pair of objects
 	{
-		typedef T1 first_type; typedef T2 second_type; T1 first; T2 second;
+		typedef T1 first_type; typedef T2 second_type;
+		T1 first; T2 second;
 
 		pair() : first(), second() {}
 		~pair() {}
 		pair(const T1 & first, const T2 & second) : first(first), second(second) {}
 		pair(const pair &other) : first(other.first), second(other.second) {}
+
 		// this ctor works with iterator types
 		template <typename A, typename B>
-		pair(const pair<A, B> & ptr) : first(ptr.first), second(ptr.second) {}
+		pair(const pair<A, B> & ptr)
+		: first(ptr.first), second(ptr.second) {}
+
 		pair & operator=(const pair & other) {
 			if (*this == other) { return (*this); }
 			first = other.first; second = other.second;  return (*this);
@@ -60,6 +64,8 @@ namespace ft
 		{}
 		bst_node(const bst_node & other)
 		: elem(other.elem), parent(other.parent), left(other.left), right(other.right) {}
+		bst_node(const bst_node * other)
+		: elem(other->elem), parent(other->parent), left(other->left), right(other->right) {}
 	}; // struct bst_node
 
 	template <typename T, typename Compare> class bst;
@@ -74,11 +80,11 @@ namespace ft
 			bst_iter(bst<T, Compare> *tree, bst_node<T> *node)
 				: _tree(tree), _node(node) {}
 			bst_iter(const bst_iter<T, Compare> & other)
-				: _tree(other.tree), _node(other.node) {}
+				: _tree(other._tree), _node(other._node) {}
 			bool operator==(const bst_iter<T, Compare> & rhs) const
-				{ return (_node == rhs.node); }
+				{ return (_node == rhs._node); }
 			bool operator!=(const bst_iter<T, Compare> & rhs) const
-				{ return (_node != rhs.node); }
+				{ return (_node != rhs._node); }
 			bst_node<T> * getP() const { return (_node); }
 			bst<T, Compare> * getTree() const { return (_tree); }
 		private:
@@ -181,7 +187,7 @@ namespace ft
 				{ bst_iterator ret(*this); operator--(); return (ret); }
 
 			T & operator*() const { return (this->_node->elem); }
-			T & operator->() const { return (&(this->_node->elem)); }
+			T * operator->() const { return (&(this->_node->elem)); }
 	}; // bst_iterator
 
 	template <typename T, typename Compare>
@@ -348,7 +354,7 @@ namespace ft
 
 			bst & operator=(const bst & other)
 			{
-				if (*this == other) { return (*this); }
+				if (this == &other) { return (*this); }
 				deep_free(_root);
 				_root = deep_copy(NULL, other._root); _cmp = other._cmp;
 				return (*this);
@@ -374,7 +380,7 @@ namespace ft
 				while (1)
 				{
 					// if the current node's key is same as our value's key
-					if (head->elem->first == val.first)
+					if (head->elem.first == val.first)
 						return (make_pair(iterator(this, head), false));
 					// if val is less than head->elem
 					if (_cmp(val, head->elem))
@@ -401,13 +407,13 @@ namespace ft
 				return (make_pair(iterator(this, newnode), true));
 			}
 
-			pair<iterator, bool> insert(iterator hint, const value_type & val)
-			{ static_cast<void>(hint); return (insert(val)); }
+//			pair<iterator, bool> insert(iterator hint, const value_type & val)
+//			{ static_cast<void>(hint); return (insert(val)); }
 
-			void insert(iterator first, iterator last)
-			{
-				iterator itr = first; while (itr != last) { insert(*itr); ++itr; }
-			}
+//			void insert(iterator first, iterator last)
+//			{
+//				iterator itr = first; while (itr != last) { insert(*itr); ++itr; }
+//			}
 
 			bool remove(const value_type & val)
 			{ return (remove(_root, val)); }
@@ -418,7 +424,7 @@ namespace ft
 				// go through the tree and find the matching key
 				while (head)
 				{
-					if (head->elem->first == val.first)
+					if (head->elem.first == val.first)
 						break ;
 					if (_cmp(val, root->elem))
 						head = head->left;
@@ -437,8 +443,8 @@ namespace ft
 				// just zeroing the parent's pointer to the node
 				if (parent) 
 				{
-					if (headside == 0) { parent->left == NULL; }
-					else { parent->right == NULL; }
+					if (headside == 0) { parent->left = NULL; }
+					else { parent->right = NULL; }
 				}
 				// if the deleted node was not a leaf, rearrange the tree :
 				Node * substitute; bool subtreeside;
@@ -450,12 +456,13 @@ namespace ft
 					return (true); // no repositioning needed
 				if (parent != NULL)
 				{
+					// LALALALALALALALALALALALAL find a way to allocate ?
 					if ( headside == 0)
-						{ parent->left = Node(substitute);  head = parent->left; }
+						{ parent->left = &Node(substitute);  head = parent->left; }
 					else
-						{ parent->right = Node(substitute); head = parent->right; }
+						{ parent->right = &Node(substitute); head = parent->right; }
 				}
-				else { _root = Node(substitute); head = _root; }
+				else { _root = &Node(substitute); head = _root; }
 				head->left = leftchild; head->right = rightchild;
 				// now that we have copied the substitute in the deleted
 				// node's place, we remove the original down in the subtree
@@ -556,7 +563,7 @@ namespace ft
 				const allocator_type & alloc = allocator_type())
 			: _tree(value_compare(comp)), _alloc(alloc)
 			{
-				_tree.insert(first, last);
+				while (first != last) { _tree.insert(*first); ++first; }
 			}
 
 			map(const map & other)
@@ -567,18 +574,18 @@ namespace ft
 
 			map & operator=(const map & rhs)
 			{
-				if (*this == rhs) { return (*this); }
+				if (this == &rhs) { return (*this); }
 				_tree = rhs._tree; _alloc = rhs._alloc; return (*this);
 			}
 
 			iterator begin()
 			{
-				Node *head = _tree.getroot();
+				Node *head = _tree.getRoot();
 				if (!head) { return (iterator(&_tree, _tree.getInit())); }
 				while (head->left) { head = head->left; }
 				return (iterator(&_tree, head));
 			}
-			iterator begin() const { Node *head = _tree.getroot();
+			iterator begin() const { Node *head = _tree.getRoot();
 				if (!head) { return (const_iterator(&_tree, _tree.getInit())); }
 				while (head->left) { head = head->left; }
 				return (const_iterator(&_tree, head)); }
@@ -605,17 +612,19 @@ namespace ft
 				iterator itr = find(k);
 				if (itr == end())
 				{ itr = _tree.insert(ft::make_pair(k, mapped_type())).first; }
-				return (itr.second);
+				return ((*itr).second);
 			}
 
-			value_type insert(const value_type & val)
+			pair<iterator, bool> insert(const value_type & val)
 			{ return (_tree.insert(val)); }
-			value_type insert(iterator hint, const value_type & val)
-			{ static_cast<void>(hint); return (_tree.insert(val)); }
-			value_type insert(iterator first, iterator last)
-			{ return (_tree.insert(first, last)); }
 
-			void erase(iterator position) { _tree.remove((*position).first); }
+			pair<iterator, bool> insert(iterator hint, const value_type & val)
+			{ static_cast<void>(hint); return (_tree.insert(val)); }
+
+			void insert(iterator first, iterator last)
+			{ while (first != last) { _tree.insert(*first); ++first; } }
+
+			void erase(iterator position) { _tree.remove(*position); }
 
 			void erase(const Key k) { _tree.remove(k); }
 
