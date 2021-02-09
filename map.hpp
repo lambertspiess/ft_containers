@@ -6,7 +6,7 @@
 /*   By: lspiess <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 17:45:17 by lspiess           #+#    #+#             */
-/*   Updated: 2021/02/09 01:54:42 by lspiess          ###   ########.fr       */
+/*   Updated: 2021/02/09 02:11:10 by lspiess          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,9 +128,13 @@ namespace ft
 					while (this->_node->left) { this->_node = this->_node->left; }
 					return (*this);
 				}
+					std::cout << "LELELELEL\n";
+					std::cout << "this->_node = " << this->_node << "\n";
+					std::cout << "this->_node->right = " << this->_node->right << "\n";
 				// if there is a subtree on the right...
 				if (this->_node->right != NULL)
 				{
+					std::cout << "LALALALAL\n";
 					// iterator will point to the smallest value in that subtree
 					this->_node = this->_node->right;
 					while (this->_node->left) { this->_node = this->_node->left; }
@@ -784,7 +788,6 @@ namespace ft
 			{
 				std::cout << "Calling erase on key : " << k << "\n";
 				_tree.remove(ft::make_pair(k, mapped_type()));
-				std::cout << "after bst.remove...\n";
 			}
 
 			void erase(iterator first, iterator last)

@@ -112,9 +112,9 @@ int main()
 		title("range construct test");
 		red("make_pair(1, a) ... make_pair(5, e)");
 		blue("ft::map<int, char> my(ft_pair, ft_pair + 5)");
-		ft::map<int, char> my(ft_pair, ft_pair + 3);
+		ft::map<int, char> my(ft_pair, ft_pair + 5);
 		print(my);
-		std::map<int, char> ori(std_pair, std_pair + 3);
+		std::map<int, char> ori(std_pair, std_pair + 5);
 		yellow("std::map<int, char> ori(std_pair, std_pair + 5)");
 		print(ori);
 		
@@ -122,19 +122,17 @@ int main()
 		title("copy construct test(check deep copy)");
 		red("ft::map<int, char> c(my)");
 		ft::map<int, char> c(my);
-		print(c);
-		c.erase(1);
-		c.printMap();
-		print(c);
-		c.erase(3);
-		c.printMap();
+//		print(c);
+//		c.erase(1);
+//		print(c);
+//		c.erase(3);
 //		print(c);
 //		c.erase(5);
-//		print(c);
-//		red("check deep copy.");
-//		red("c.clear() and print(c)");
-//		c.clear();
-//		print(c);
+		print(c);
+		red("check deep copy.");
+		red("c.clear() and print(c)");
+		c.clear();
+		print(c);
 //		red("after c.clear and print(my)");
 //		print(my);
 //
