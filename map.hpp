@@ -6,7 +6,7 @@
 /*   By: lspiess <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 17:45:17 by lspiess           #+#    #+#             */
-/*   Updated: 2021/02/08 02:22:24 by lspiess          ###   ########.fr       */
+/*   Updated: 2021/02/09 01:54:42 by lspiess          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,7 @@ namespace ft
 			// increment to the closest bigger node according to Compare
 			bst_iterator & operator++(void)
 			{
-				Node *root = this->_tree->getRoot(), *tmp;
+				Node *root = this->_tree->getRoot();
 				 // if tree is empty, iterator will point to the init node
 				if (root == NULL) { this->_node = this->_tree->getInit(); return (*this); }
 				// if _node is NULL or out of bounds, go to the smallest node
@@ -139,12 +139,12 @@ namespace ft
 				// this->node is the rightmost node of its branch. Gotta look
 				// for a bigger parent.
 				// While the parent is smaller than the child, go up...
-				while (this->node->parent && this->node->parent->right == this->node)
-					{ this->node = this->node->parent; }
+				while (this->_node->parent && this->_node->parent->right == this->_node)
+					{ this->_node = this->_node->parent; }
 				// then go to that parent
-				this->node = this->node->parent;
+				this->_node = this->_node->parent;
 				// if we haven't found a bigger parent, return init
-				if (this->node == NULL) { this->node = this->_tree.getInit(); }
+				if (this->_node == NULL) { this->_node = this->_tree->getInit(); }
 				return (*this);
 			}
 
@@ -407,70 +407,209 @@ namespace ft
 				return (make_pair(iterator(this, newnode), true));
 			}
 
-//			pair<iterator, bool> insert(iterator hint, const value_type & val)
-//			{ static_cast<void>(hint); return (insert(val)); }
-
-//			void insert(iterator first, iterator last)
-//			{
-//				iterator itr = first; while (itr != last) { insert(*itr); ++itr; }
-//			}
-
 			bool remove(const value_type & val)
-			{ return (remove(_root, val)); }
+			{
+				std::cout << "===============================\n";
+				printTree();
+				std::cout << "===============================\n";
+				bool ret = remove(_root, val);
+//				return (remove(_root, val));
+				std::cout << "===============================\n";
+				printTree();
+				std::cout << "===============================\n";
+				return (ret);
+			}
 
 			bool remove(Node * root, const value_type & val)
 			{
-				if (root == NULL) { return (false); } Node * head = root;
-				// go through the tree and find the matching key
-				while (head)
-				{
-					if (head->elem.first == val.first)
-						break ;
-					if (_cmp(val, root->elem))
-						head = head->left;
-					else
-						head = head->right;
-				}
-				// if no node with a matching key was not found, return
-				if (head == NULL) { return (false); }
-				// save some info needed to rearrange the tree...
-				Node *leftchild = head->left, *rightchild = head->right;
-				Node *parent = head->parent;
-				bool headside; // the node's position relative to its parent
-				if (parent) { headside = (parent->left == head) ? 0 : 1; }
-				// deleting the node
-				_node_alloc.destroy(head); _node_alloc.deallocate(head, 1);
-				// just zeroing the parent's pointer to the node
-				if (parent) 
-				{
-					if (headside == 0) { parent->left = NULL; }
-					else { parent->right = NULL; }
-				}
-				// if the deleted node was not a leaf, rearrange the tree :
-				Node * substitute; bool subtreeside;
-				if (leftchild)
-					{ substitute = find_max(leftchild);subtreeside = 0; }
-				else if (rightchild)
-					{ substitute = find_min(rightchild); subtreeside = 1; }
-				else // no subtrees means we removed a leaf node
-					return (true); // no repositioning needed
-				if (parent != NULL)
-				{
-					// LALALALALALALALALALALALAL find a way to allocate ?
-					if ( headside == 0)
-						{ parent->left = &Node(substitute);  head = parent->left; }
-					else
-						{ parent->right = &Node(substitute); head = parent->right; }
-				}
-				else { _root = &Node(substitute); head = _root; }
-				head->left = leftchild; head->right = rightchild;
-				// now that we have copied the substitute in the deleted
-				// node's place, we remove the original down in the subtree
-				if (subtreeside == 0)
-					remove(head->left, head->elem);
-				else
-					remove(head->right, head->elem);
-				return (true);
+		Node *del = NULL;
+		Node *delp = NULL;
+		Node *cdd = NULL;
+		Node *cddp = NULL;
+		Node *tmp = NULL;
+
+		if (!_root)
+			return false;
+		tmp = _root;
+		while (tmp)
+		{
+			// first == key
+			if (val.first == tmp->elem.first)
+			{
+				// 현재 가리키고 있는 노드를 del 전용 노드에 연결시키고 반복 종료
+				del = tmp;
+				break;
+			}
+			if (_cmp(val, tmp->elem))
+				tmp = tmp->left;
+			else
+				tmp = tmp->right;
+		}
+		if (!del)
+			return false; // nothing to delete
+
+		//Before deleting, reorg the BST
+		delp = del->parent;
+		if (!del->right) // case1. no right node of del
+			cdd = del->left;
+		else if (!del->right->left) // case2. right node of del has no left child
+		{
+			cdd = del->right;
+			cdd->left = del->left;
+			//del->left->parent = cdd;
+		}
+		else // case3 has both of child
+		{
+			cddp = del;
+			cdd = del->right;
+			while (cdd->left)
+			{
+				cddp = cdd;
+				cdd = cdd->left;
+			}
+			cddp->left = cdd->right;
+			if (cdd->right)
+				cdd->right->parent = cddp;
+
+			cdd->left = del->left;
+			if (del->left)
+				del->left->parent = cdd;
+
+			cdd->right = del->right;
+			del->right->parent = cdd;
+		}
+		// make cdd as child of delp
+		if (delp)
+		{
+			Node **delpLR = (delp->left == del) ? &delp->left : &delp->right;
+			*delpLR = cdd;
+		}
+		else
+		{
+			_root = cdd;
+		}
+		if (cdd) // if del is not leaf node
+			cdd->parent = delp;
+
+		//Finally delete
+		delete del;
+		return true;
+
+
+
+//				std::cout << "-----\nIn remove, target = " << val.first << "\n";
+//				if (root == NULL) { return (false); } Node * head = root;
+//				// go through the tree and find the matching key
+//				while (head)
+//				{
+//					if (head->elem.first == val.first)
+//						break ;
+//					if (_cmp(val, root->elem))
+//						head = head->left;
+//					else
+//						head = head->right;
+//				}
+//
+//				if (head == NULL) { std::cout << "\tHead == NULL, returning\n" << "\n"; }
+//				else {
+//					std::cout << "\tHead arrived to : " << head << ", "<< head->elem.first
+//						<< ", " << head->elem.second << "\n";
+//				}
+//
+//				// if no node with a matching key was not found, return
+//				if (head == NULL) { return (false); }
+//				// save some info needed to rearrange the tree...
+//				Node *leftchild = head->left, *rightchild = head->right;
+//				std::cout << "leftchild = " << leftchild << ", rightchild = " << rightchild
+//					<< "\n";
+//				Node *parent = head->parent;
+//				bool headside = 0; // the node's position relative to its parent
+//				if (parent)
+//				{
+//					std::cout << "parent = " << parent << "parent->left = "
+//					<< parent->left << ", " << "parent->right = " << parent->right << "\n";
+//					std::cout << "head = " << head << "\n";
+//					if (parent->left == head)
+//					{
+//						headside = 0;
+//					}
+//					else { headside = 1; }
+//					std::cout << "\theadside = " << headside << "\n";
+//				}
+//				// deleting the node
+//				std::cout << "\tdeallocating " << head << "\n";
+//				_node_alloc.destroy(head); _node_alloc.deallocate(head, 1); head = NULL;
+//				std::cout << "\tdeallocated, headside = " << headside << "\n";
+//				// just zeroing the parent's pointer to the node
+//				if (parent) 
+//				{
+//					std::cout << "\tzeroing parent branch\n";
+//					if (headside == 0) { parent->left = NULL; }
+//					else { parent->right = NULL; }
+//					std::cout << "parent->left = " << parent->left
+//						<< ", parent->right = " << parent->right << "\n";
+//				}
+//
+//				// if the deleted node was not a leaf, rearrange the tree :
+//				Node * substitute; bool subtreeside;
+//				if (leftchild)
+//				{
+//					std::cout << "\t\tfinding max in leftchild...";
+//					substitute = find_max(leftchild); subtreeside = 0;
+//					std::cout << " substitute = " << substitute->elem.first
+//						<< ", " << substitute->elem.second << "\n";
+//				}
+//				else if (rightchild)
+//				{
+//					std::cout << "\t\tfinding min in rightchild...";
+//					substitute = find_min(rightchild); subtreeside = 1;
+//					std::cout << " substitute = " << substitute->elem.first
+//						<< ", " << substitute->elem.second << "\n";
+//				}
+//				else // no subtrees means we removed a leaf node
+//				{
+//					std::cout << "\tjust deleted a leaf, returning...\n";
+//					return (true); // no repositioning needed
+//				}
+//
+//				if (parent != NULL)
+//				{
+//					if ( headside == 0)
+//					{
+//						parent->left = _node_alloc.allocate(1);
+//						_node_alloc.construct(parent->left, Node(substitute->elem,
+//							substitute->parent, substitute->left, substitute->right));
+//						head = parent->left;
+//					}
+//					else
+//					{
+//						parent->right = _node_alloc.allocate(1);
+//						_node_alloc.construct(parent->right, Node(substitute->elem,
+//							substitute->parent, substitute->left, substitute->right));
+//						head = parent->right;
+//					}
+//				}
+//				else
+//				{
+//					_root = _node_alloc.allocate(1);
+//					_node_alloc.construct(_root, Node(substitute->elem,
+//						substitute->parent, substitute->left, substitute->right));
+//					head = _root;
+//				}
+//				head->left = leftchild; head->right = rightchild;
+//				if (leftchild) { leftchild->parent = head; }
+//				if (rightchild) { rightchild->parent = head; }
+//
+//				std::cout << "Substituted the deleted node. Printing :\n";
+//				printTree();
+//				std::cout << "Removing the double...\n";
+//				// now that we have copied the substitute in the deleted
+//				// node's place, we remove the original down in the subtree
+//				if (subtreeside == 0)
+//					remove(head->left, head->elem);
+//				else
+//					remove(head->right, head->elem);
+//				return (true);
 			}
 
 			Node * find_max(Node * root)
@@ -496,6 +635,21 @@ namespace ft
 			{
 				Node * node = _root;
 				return (getTreeSize(node));
+			}
+
+			void printTree(Node * node) const
+			{
+				if (node == NULL) { return ; }
+				if (node->left) { printTree(node->left); }
+				std::cout << node << ", " << node->elem.first << ", "
+				<<  node->elem.second << ", node->left " << node->left
+				<< ", node->right " << node->right << "\n";
+				if (node->right) { printTree(node->right); }
+			}
+
+			void printTree() const
+			{
+				printTree(_root);
 			}
 	}; // class bst
 
@@ -626,11 +780,23 @@ namespace ft
 
 			void erase(iterator position) { _tree.remove(*position); }
 
-			void erase(const Key k) { _tree.remove(k); }
+			void erase(const Key & k)
+			{
+				std::cout << "Calling erase on key : " << k << "\n";
+				_tree.remove(ft::make_pair(k, mapped_type()));
+				std::cout << "after bst.remove...\n";
+			}
 
 			void erase(iterator first, iterator last)
 			{
-				while (first != last) { erase((*first).first); ++first; }
+				while (first != last)
+				{
+					std::cout << "sfsg\n";
+					std::cout << "erasing : " << (*first).first << "\n";
+					erase((*first).first);
+					std::cout << "about to ++first....\n";
+					++first;
+				}
 			}
 
 			void swap(map & other)
@@ -646,16 +812,16 @@ namespace ft
 
 			iterator find(const key_type & k) 
 			{
-				Node * head = _tree.getRoot();
+				Node * head = _tree.getRoot(); key_compare comp;
 				while (head)
 				{
-					if (head->elem->first == k) { return (iterator(&_tree, head)); }
-					if (comp(k, head->elem->first) == true)
+					if (head->elem.first == k) { return (iterator(&_tree, head)); }
+					if (comp(k, head->elem.first) == true)
 						head = head->left;
 					else
 						head = head->right;
 				}
-				return (iterator(&_tree, end()));
+				return (end());
 			}
 
 			const_iterator find(const key_type & k) const {
@@ -666,7 +832,7 @@ namespace ft
 						head = head->left;
 					else
 						head = head->right;
-				} return (const_iterator(&_tree, end()));
+				} return (end());
 			}
 
 			// find the number of elements with a given key. This only makes
@@ -681,11 +847,11 @@ namespace ft
 			// than key, or end()
 			iterator lower_bound(const key_type & k)
 			{
-				Node *head = _tree.getRoot();
+				Node *head = _tree.getRoot(); key_compare comp;
 				while (head)
 				{
-					if (head->value->first == k) { return (iterator(&_tree, head)); }
-					if (cmp(head->value->first, k) == true)
+					if (head->elem.first == k) { return (iterator(&_tree, head)); }
+					if (comp(head->elem.first, k) == true)
 						head = head->left;
 					else if (head->right)
 					{
@@ -694,15 +860,15 @@ namespace ft
 						return (iterator(&_tree, head));
 					}
 				}
-				return (iterator(&_tree, end()));
+				return (end());
 			}
 			const_iterator lower_bound(const key_type & k) const
 			{
-				Node *head = _tree.getRoot();
+				Node *head = _tree.getRoot(); key_compare comp;
 				while (head)
 				{
-					if (head->value->first == k) { return (const_iterator(&_tree, head)); }
-					if (cmp(head->value->first, k) == true)
+					if (head->elem.first == k) { return (const_iterator(&_tree, head)); }
+					if (comp(head->elem.first, k) == true)
 						head = head->left;
 					else if (head->right)
 					{
@@ -711,18 +877,18 @@ namespace ft
 						return (const_iterator(&_tree, head));
 					}
 				}
-				return (const_iterator(&_tree, end()));
+				return (end());
 			}
 
 			// return an iterator to the first element equal to or smaller
 			// than key, or end()
 			iterator upper_bound(const key_type & k)
 			{
-				Node *head = _tree.getRoot();
+				Node *head = _tree.getRoot(); key_compare comp;
 				while (head)
 				{
-					if (head->value->first == k) { return (iterator(&_tree, head)); }
-					if (cmp(k, head->value->first) == true)
+					if (head->elem.first == k) { return (iterator(&_tree, head)); }
+					if (comp(k, head->elem.first) == true)
 						head = head->right;
 					else if (head->left)
 					{
@@ -731,15 +897,15 @@ namespace ft
 						return (iterator(&_tree, head));
 					}
 				}
-				return (iterator(&_tree, end()));
+				return (end());
 			}
 			const_iterator upper_bound(const key_type & k) const
 			{
-				Node *head = _tree.getRoot();
+				Node *head = _tree.getRoot(); key_compare comp;
 				while (head)
 				{
-					if (head->value->first == k) { return (const_iterator(&_tree, head)); }
-					if (cmp(k, head->value->first) == true)
+					if (head->elem.first == k) { return (const_iterator(&_tree, head)); }
+					if (comp(k, head->elem.first) == true)
 						head = head->right;
 					else if (head->left)
 					{
@@ -748,7 +914,7 @@ namespace ft
 						return (const_iterator(&_tree, head));
 					}
 				}
-				return (const_iterator(&_tree, end()));
+				return (end());
 			}
 
 			// return a pair of iterator that possibly point to the subsequence
@@ -760,6 +926,8 @@ namespace ft
 			// matching the given key. Again, only makes sense for multimaps.
 			pair<iterator, iterator> equal_range(const key_type & k)
 			{ return (ft::make_pair(lower_bound(k), upper_bound(k))); }
+
+			void printMap() const { _tree.printTree(); }
 
 	}; // class map
 
