@@ -6,7 +6,7 @@
 /*   By: lspiess <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 17:45:17 by lspiess           #+#    #+#             */
-/*   Updated: 2021/02/09 02:11:10 by lspiess          ###   ########.fr       */
+/*   Updated: 2021/02/09 18:19:12 by lspiess          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,13 +128,12 @@ namespace ft
 					while (this->_node->left) { this->_node = this->_node->left; }
 					return (*this);
 				}
-					std::cout << "LELELELEL\n";
-					std::cout << "this->_node = " << this->_node << "\n";
-					std::cout << "this->_node->right = " << this->_node->right << "\n";
+					std::cout << "\t\t\tIn increment...\n";
+					std::cout << "\t\t\tthis->_node = " << this->_node << "\n";
+					std::cout << "\t\t\tthis->_node->right = " << this->_node->right << "\n";
 				// if there is a subtree on the right...
 				if (this->_node->right != NULL)
 				{
-					std::cout << "LALALALAL\n";
 					// iterator will point to the smallest value in that subtree
 					this->_node = this->_node->right;
 					while (this->_node->left) { this->_node = this->_node->left; }
@@ -366,15 +365,13 @@ namespace ft
 
 			virtual ~bst() { deep_free(_root); _node_alloc.deallocate(_init, 1); }
 
-			// Look for a pre-existing node whose key equals val.first.
+			// Look for a pre-existing node whose key equals val's.
 			// If not present, create and insert it in the tree.
-			// Return an iterator to that node;
+			// Return a pair comprising the iterator to the relevant node and
+			// a boolean, set to true if a new node was created, false otherwise.
 			pair<iterator, bool> insert(const value_type & val)
 			{
 				Node *newnode, *head = _root;
-				// the returned pair comprises the iterator to the relevant
-				// node and a boolean. That bool is set to true if a new node
-				// had to be created, false if it already existed.
 				if (_root == NULL)
 				{
 					_root = _node_alloc.allocate(1);
@@ -426,108 +423,46 @@ namespace ft
 
 			bool remove(Node * root, const value_type & val)
 			{
-		Node *del = NULL;
-		Node *delp = NULL;
-		Node *cdd = NULL;
-		Node *cddp = NULL;
-		Node *tmp = NULL;
+				std::cout << "-----\nIn remove, target = " << val.first << "\n";
+				if (root == NULL) { return (false); } Node * head = root;
+				// go through the tree and find the matching key
+				while (head)
+				{
+					if (head->elem.first == val.first)
+						break ;
+					if (_cmp(val, head->elem))
+						head = head->left;
+					else
+						head = head->right;
+				}
 
-		if (!_root)
-			return false;
-		tmp = _root;
-		while (tmp)
-		{
-			// first == key
-			if (val.first == tmp->elem.first)
-			{
-				// 현재 가리키고 있는 노드를 del 전용 노드에 연결시키고 반복 종료
-				del = tmp;
-				break;
-			}
-			if (_cmp(val, tmp->elem))
-				tmp = tmp->left;
-			else
-				tmp = tmp->right;
-		}
-		if (!del)
-			return false; // nothing to delete
+				if (head == NULL) { std::cout << "\tHead == NULL, returning\n" << "\n"; }
+				else {
+					std::cout << "\tHead arrived to : " << head << ", "<< head->elem.first
+						<< ", " << head->elem.second << "\n";
+				}
 
-		//Before deleting, reorg the BST
-		delp = del->parent;
-		if (!del->right) // case1. no right node of del
-			cdd = del->left;
-		else if (!del->right->left) // case2. right node of del has no left child
-		{
-			cdd = del->right;
-			cdd->left = del->left;
-			//del->left->parent = cdd;
-		}
-		else // case3 has both of child
-		{
-			cddp = del;
-			cdd = del->right;
-			while (cdd->left)
-			{
-				cddp = cdd;
-				cdd = cdd->left;
-			}
-			cddp->left = cdd->right;
-			if (cdd->right)
-				cdd->right->parent = cddp;
+				// if no node with a matching key was not found, return
+				if (head == NULL) { return (false); }
+				// save some info needed to rearrange the tree...
+				Node *leftchild = head->left, *rightchild = head->right;
+				std::cout << "leftchild = " << leftchild << ", rightchild = " << rightchild
+					<< "\n";
+				Node *parent = head->parent;
+				std::cout << "parent = " << parent << "\n";
+				bool headside = 0; // the node's position relative to its parent
 
-			cdd->left = del->left;
-			if (del->left)
-				del->left->parent = cdd;
-
-			cdd->right = del->right;
-			del->right->parent = cdd;
-		}
-		// make cdd as child of delp
-		if (delp)
-		{
-			Node **delpLR = (delp->left == del) ? &delp->left : &delp->right;
-			*delpLR = cdd;
-		}
-		else
-		{
-			_root = cdd;
-		}
-		if (cdd) // if del is not leaf node
-			cdd->parent = delp;
-
-		//Finally delete
-		delete del;
-		return true;
+				if (parent)
+				{
+					if (parent->left == head)
+						{ parent->left = NULL; headside = 0; }
+					else if (parent->right == head)
+						{ parent->right = NULL; headside = 1; }
+				}
+//				std::cout << "After zeroing, parent (" << parent << ") left = "
+//					<< parent->left << ", right = " << parent->right << "\n";
 
 
-
-//				std::cout << "-----\nIn remove, target = " << val.first << "\n";
-//				if (root == NULL) { return (false); } Node * head = root;
-//				// go through the tree and find the matching key
-//				while (head)
-//				{
-//					if (head->elem.first == val.first)
-//						break ;
-//					if (_cmp(val, root->elem))
-//						head = head->left;
-//					else
-//						head = head->right;
-//				}
-//
-//				if (head == NULL) { std::cout << "\tHead == NULL, returning\n" << "\n"; }
-//				else {
-//					std::cout << "\tHead arrived to : " << head << ", "<< head->elem.first
-//						<< ", " << head->elem.second << "\n";
-//				}
-//
-//				// if no node with a matching key was not found, return
-//				if (head == NULL) { return (false); }
-//				// save some info needed to rearrange the tree...
-//				Node *leftchild = head->left, *rightchild = head->right;
-//				std::cout << "leftchild = " << leftchild << ", rightchild = " << rightchild
-//					<< "\n";
-//				Node *parent = head->parent;
-//				bool headside = 0; // the node's position relative to its parent
 //				if (parent)
 //				{
 //					std::cout << "parent = " << parent << "parent->left = "
@@ -540,10 +475,6 @@ namespace ft
 //					else { headside = 1; }
 //					std::cout << "\theadside = " << headside << "\n";
 //				}
-//				// deleting the node
-//				std::cout << "\tdeallocating " << head << "\n";
-//				_node_alloc.destroy(head); _node_alloc.deallocate(head, 1); head = NULL;
-//				std::cout << "\tdeallocated, headside = " << headside << "\n";
 //				// just zeroing the parent's pointer to the node
 //				if (parent) 
 //				{
@@ -553,67 +484,73 @@ namespace ft
 //					std::cout << "parent->left = " << parent->left
 //						<< ", parent->right = " << parent->right << "\n";
 //				}
-//
-//				// if the deleted node was not a leaf, rearrange the tree :
-//				Node * substitute; bool subtreeside;
-//				if (leftchild)
-//				{
-//					std::cout << "\t\tfinding max in leftchild...";
-//					substitute = find_max(leftchild); subtreeside = 0;
-//					std::cout << " substitute = " << substitute->elem.first
-//						<< ", " << substitute->elem.second << "\n";
-//				}
-//				else if (rightchild)
-//				{
-//					std::cout << "\t\tfinding min in rightchild...";
-//					substitute = find_min(rightchild); subtreeside = 1;
-//					std::cout << " substitute = " << substitute->elem.first
-//						<< ", " << substitute->elem.second << "\n";
-//				}
-//				else // no subtrees means we removed a leaf node
-//				{
-//					std::cout << "\tjust deleted a leaf, returning...\n";
-//					return (true); // no repositioning needed
-//				}
-//
-//				if (parent != NULL)
-//				{
-//					if ( headside == 0)
-//					{
-//						parent->left = _node_alloc.allocate(1);
-//						_node_alloc.construct(parent->left, Node(substitute->elem,
-//							substitute->parent, substitute->left, substitute->right));
-//						head = parent->left;
-//					}
-//					else
-//					{
-//						parent->right = _node_alloc.allocate(1);
-//						_node_alloc.construct(parent->right, Node(substitute->elem,
-//							substitute->parent, substitute->left, substitute->right));
-//						head = parent->right;
-//					}
-//				}
-//				else
-//				{
-//					_root = _node_alloc.allocate(1);
-//					_node_alloc.construct(_root, Node(substitute->elem,
-//						substitute->parent, substitute->left, substitute->right));
-//					head = _root;
-//				}
-//				head->left = leftchild; head->right = rightchild;
-//				if (leftchild) { leftchild->parent = head; }
-//				if (rightchild) { rightchild->parent = head; }
-//
-//				std::cout << "Substituted the deleted node. Printing :\n";
-//				printTree();
-//				std::cout << "Removing the double...\n";
-//				// now that we have copied the substitute in the deleted
-//				// node's place, we remove the original down in the subtree
-//				if (subtreeside == 0)
-//					remove(head->left, head->elem);
-//				else
-//					remove(head->right, head->elem);
-//				return (true);
+
+				// deleting the node
+				std::cout << "\tdeallocating " << head << "\n";
+				Node * to_free = head;
+				_node_alloc.destroy(head); _node_alloc.deallocate(head, 1); head = NULL;
+				std::cout << "\tdeallocated, headside = " << headside << "\n";
+
+				// if the deleted node was not a leaf, rearrange the tree :
+				Node * substitute; bool subtreeside;
+				if (leftchild)
+				{
+					std::cout << "\t\tfinding max in leftchild...";
+					substitute = find_max(leftchild); subtreeside = 0;
+					std::cout << " substitute = " << substitute->elem.first
+						<< ", " << substitute->elem.second << "\n";
+				}
+				else if (rightchild)
+				{
+					std::cout << "\t\tfinding min in rightchild...";
+					substitute = find_min(rightchild); subtreeside = 1;
+					std::cout << " substitute = " << substitute->elem.first
+						<< ", " << substitute->elem.second << "\n";
+				}
+				else // no subtrees means we removed a leaf node
+				{
+					std::cout << "\tjust deleted a leaf, returning...\n";
+					return (true); // no repositioning needed
+				}
+
+				if (parent != NULL)
+				{
+					if ( headside == 0)
+					{
+						parent->left = _node_alloc.allocate(1);
+						_node_alloc.construct(parent->left, Node(substitute->elem,
+							parent, leftchild, rightchild));
+						head = parent->left;
+					}
+					else
+					{
+						parent->right = _node_alloc.allocate(1);
+						_node_alloc.construct(parent->right, Node(substitute->elem,
+							parent, leftchild, rightchild));
+						head = parent->right;
+					}
+				}
+				else
+				{
+					_root = _node_alloc.allocate(1);
+					_node_alloc.construct(_root, Node(substitute->elem,
+						NULL, leftchild, rightchild));
+					head = _root;
+				}
+				head->left = leftchild; head->right = rightchild;
+				if (leftchild) { leftchild->parent = head; }
+				if (rightchild) { rightchild->parent = head; }
+
+				std::cout << "Substituted the deleted node. Printing :\n";
+				printTree();
+				std::cout << "Removing the double...\n";
+				// now that we have copied the substitute in the deleted
+				// node's place, we remove the original down in the subtree
+				if (subtreeside == 0)
+					remove(head->left, head->elem);
+				else
+					remove(head->right, head->elem);
+				return (true);
 			}
 
 			Node * find_max(Node * root)
@@ -641,20 +578,31 @@ namespace ft
 				return (getTreeSize(node));
 			}
 
-			void printTree(Node * node) const
+			void printTree(Node *node, int space) const
 			{
-				if (node == NULL) { return ; }
-				if (node->left) { printTree(node->left); }
-				std::cout << node << ", " << node->elem.first << ", "
-				<<  node->elem.second << ", node->left " << node->left
-				<< ", node->right " << node->right << "\n";
-				if (node->right) { printTree(node->right); }
+				if (node)
+				{
+					if (node->right) { printTree(node->right, 0); }
+				}
+//				std::cout << node->elem.first << ", " <<  node->elem.second
+//					<< " [" << node << "]\n";
+//				if (!node) { return ; }
+//				if (node->right)
+//				{
+//					printTree(node->right, space + 1);
+//				}
+//				for (int i = 0; i < space; i++) { std::cout << "\t"; }
+//				std::cout << node->elem.first << ", " <<  node->elem.second
+//					<< " [" << node << "]\n";
+//				if (node->left)
+//				{
+//					printTree(node->right, space + 1);
+//				}
 			}
 
-			void printTree() const
-			{
-				printTree(_root);
-			}
+			void printTree(Node * node) const { printTree(node, 0); }
+
+			void printTree() const { printTree(_root); }
 	}; // class bst
 
 	template <class T>

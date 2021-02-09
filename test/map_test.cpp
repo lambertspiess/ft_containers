@@ -30,6 +30,7 @@ void print(M & a)
 {
 	typename M::iterator it = a.begin();
 	std::cout << "\033[1;36;40m============================\033[0m" << std::endl;
+	std::cout << "in print, size = " << a.size() << "\n";
 	for (size_t i = 0; i < a.size(); i++, it++)
 	{
 		std::cout << "\033[1;31;40mkey: \033[0m" << it->first << 
@@ -122,17 +123,23 @@ int main()
 		title("copy construct test(check deep copy)");
 		red("ft::map<int, char> c(my)");
 		ft::map<int, char> c(my);
-//		print(c);
-//		c.erase(1);
-//		print(c);
-//		c.erase(3);
-//		print(c);
+		print(c);
+		c.erase(3);
+		print(c);
+		c.erase(1);
+		print(c);
+		c.erase(5);
+		print(c);
+		c.erase(2);
+		print(c);
+		c.erase(4);
+		print(c);
 //		c.erase(5);
-		print(c);
-		red("check deep copy.");
-		red("c.clear() and print(c)");
-		c.clear();
-		print(c);
+//		print(c);
+//		red("check deep copy.");
+//		red("c.clear() and print(c)");
+//		c.clear();
+//		print(c);
 //		red("after c.clear and print(my)");
 //		print(my);
 //
