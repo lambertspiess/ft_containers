@@ -119,25 +119,17 @@ int main()
 		yellow("std::map<int, char> ori(std_pair, std_pair + 5)");
 		print(ori);
 		
-		std::cout << std::endl;
-		title("copy construct test(check deep copy)");
-		red("ft::map<int, char> c(my)");
-		ft::map<int, char> c(my);
-		print(c);
-		c.erase(3);
-		print(c);
-		c.erase(1);
-		print(c);
-		c.erase(5);
-		print(c);
-		c.erase(2);
-		print(c);
-		c.erase(4);
-		print(c);
-//		c.erase(5);
+//		std::cout << std::endl;
+//		title("copy construct test(check deep copy)");
+//		red("ft::map<int, char> c(my)");
+//		ft::map<int, char> c(my);
+//		red("checking deep copy.");
 //		print(c);
-//		red("check deep copy.");
-//		red("c.clear() and print(c)");
+//		c.erase(1);
+//		print(c);
+//		c.erase(2);
+//		print(c);
+//		red("checking c.clear().");
 //		c.clear();
 //		print(c);
 //		red("after c.clear and print(my)");
@@ -145,7 +137,7 @@ int main()
 //
 //		std::cout << std::endl;
 //		title("assignment operator test");
-//		red("ft::map<int, char> a; a = my");
+//		red("ft::map<int, char> a; a = my; print(a)");
 //		ft::map<int, char> a;
 //		a = my;
 //		print(a);
@@ -177,64 +169,65 @@ int main()
 //		std::cout << "std's max size: " << ori.max_size() << std::endl;
 //		std::cout << std::endl;
 //
-//		title("operator[] test");
-//		red("ft");
-//		print(my);
-//		blue("char op = my[7]\nif input key doesnt exist, insert key");
-//		char op = my[7];
-//		print(my);
-//
-//		red("std");
-//		print(ori);
-//		op = ori[7];
-//		yellow("char op = ori[7]\nif input key doesnt exist, insert key");
-//		print(ori);
-//		std::cout << std::endl;
-//
-//		title("insert(val)");
-//		blue("my.insert(ft::make_pair(10, h))");
-//		my.insert(ft::make_pair(10, 'h'));
-//		print(my);
-//		yellow("ori.insert(std::make_pair(10, h))");
-//		ori.insert(std::make_pair(10, 'h'));
-//		print(ori);
-//
-//		red("insert already exist key\n");
-//		blue("my.insert(ft::make_pair(3, h))");
-//		my.insert(ft::make_pair(3, 'h'));
-//		print(my);
-//		
-//		yellow("ori.insert(std::make_pair(3, h))");
-//		ori.insert(std::make_pair(3, 'h'));
-//		print(ori);
-//
-//		title("insert(position, val)");
-//		red("ft::map<int, char>::iterator myIter = my.begin();\nit++;it++it++");
-//		ft::map<int, char>::iterator ftIter = my.begin();
-//		ftIter++; ftIter++; ftIter++;
-//		blue("my.insert(myIter, ft::make_pair(15, 'z'));");
-//		my.insert(ftIter, ft::make_pair(15, 'z'));
-//		print(my);
-//
-//		std::map<int, char>::iterator stdIter = ori.begin();
-//		stdIter++; stdIter++; stdIter++;
-//		ori.insert(stdIter, std::make_pair(15, 'z'));
-//		print(ori);
-//
-//		title("insert(first, last)");
-//		ft::map<int, char> my2(ft2_pair, ft2_pair + 5);
-//		std::map<int, char> ori2(std2_pair, std2_pair + 5);
-//		red("my2");
-//		print(my2);
-//		red("ori2");
-//		print(ori2);
-//		blue("my.insert(my2.begin(), my2.end())");
-//		my.insert(my2.begin(), my2.end());
-//		print(my);
-//		yellow("ori.insert(ori2.begin(), ori2.end())");
-//		ori.insert(ori2.begin(), ori2.end());
-//		print(ori);
-//
+		title("operator[] test");
+		red("ft");
+		print(my);
+		blue("char op = my[7]\nif input key doesnt exist, insert key");
+		char op = my[7];
+		print(my);
+
+		red("std");
+		print(ori);
+		op = ori[7];
+		yellow("char op = ori[7]\nif input key doesnt exist, insert key");
+		print(ori);
+		std::cout << std::endl;
+
+		title("insert(val)");
+		blue("my.insert(ft::make_pair(10, h))");
+		my.insert(ft::make_pair(10, 'h'));
+		print(my);
+		yellow("ori.insert(std::make_pair(10, h))");
+		ori.insert(std::make_pair(10, 'h'));
+		print(ori);
+
+		red("insert already exist key\n");
+		blue("my.insert(ft::make_pair(3, h))");
+		my.insert(ft::make_pair(3, 'h'));
+		print(my);
+		
+		yellow("ori.insert(std::make_pair(3, h))");
+		ori.insert(std::make_pair(3, 'h'));
+		print(ori);
+
+		title("insert(position, val)");
+		red("ft::map<int, char>::iterator myIter = my.begin();\nit++;it++it++");
+		ft::map<int, char>::iterator ftIter = my.begin();
+		ftIter++; ftIter++; ftIter++;
+		blue("my.insert(myIter, ft::make_pair(15, 'z'));");
+		my.insert(ftIter, ft::make_pair(15, 'z'));
+		print(my);
+
+		std::map<int, char>::iterator stdIter = ori.begin();
+		stdIter++; stdIter++; stdIter++;
+		ori.insert(stdIter, std::make_pair(15, 'z'));
+		print(ori);
+
+		// infinite loop here
+		title("insert(first, last)");
+		ft::map<int, char> my2(ft2_pair, ft2_pair + 5);
+		std::map<int, char> ori2(std2_pair, std2_pair + 5);
+		red("my2");
+		print(my2);
+		red("ori2");
+		print(ori2);
+		blue("my.insert(my2.begin(), my2.end())");
+		my.insert(my2.begin(), my2.end());
+		print(my);
+		yellow("ori.insert(ori2.begin(), ori2.end())");
+		ori.insert(ori2.begin(), ori2.end());
+		print(ori);
+
 //		title("erase(position)");
 //		blue("my.erase(my.begin())");
 //		my.erase(my.begin());

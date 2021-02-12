@@ -6,7 +6,7 @@
 /*   By: lspiess <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 17:45:17 by lspiess           #+#    #+#             */
-/*   Updated: 2021/02/09 18:19:12 by lspiess          ###   ########.fr       */
+/*   Updated: 2021/02/12 21:44:29 by lspiess          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,32 +119,48 @@ namespace ft
 			bst_iterator & operator++(void)
 			{
 				Node *root = this->_tree->getRoot();
+//				std::cout << "in increment, root = " << root
+//							<< ", this->_node = " << this->_node << "\n";
+//				std::cout << "root->elem.first = " << root->elem.first << "\n";
 				 // if tree is empty, iterator will point to the init node
-				if (root == NULL) { this->_node = this->_tree->getInit(); return (*this); }
+				if (root == NULL)
+				{
+					this->_node = this->_tree->getInit();
+//					std::cout << "this->_node = this->_tree->getInit() = " << this->_node << "\n";
+					return (*this);
+				}
 				// if _node is NULL or out of bounds, go to the smallest node
 				if (this->_node == NULL || this->_node == this->_tree->getInit())
 				{
 					this->_node = root;
-					while (this->_node->left) { this->_node = this->_node->left; }
+//					std::cout << "\tthis->_node = root = " << this->_node << "\n";
+					while (this->_node->left)
+					{ 
+//						std::cout << "\tthis->_node->left = " << this->_node->left << "\n";
+						this->_node = this->_node->left;
+					}
 					return (*this);
 				}
-					std::cout << "\t\t\tIn increment...\n";
-					std::cout << "\t\t\tthis->_node = " << this->_node << "\n";
-					std::cout << "\t\t\tthis->_node->right = " << this->_node->right << "\n";
 				// if there is a subtree on the right...
 				if (this->_node->right != NULL)
 				{
 					// iterator will point to the smallest value in that subtree
+//					std::cout << "\tthis->_node->right = " << this->_node->right << "\n";
 					this->_node = this->_node->right;
+//					std::cout << "\tthis->_node->left = " << this->_node->left << "\n";
 					while (this->_node->left) { this->_node = this->_node->left; }
+//					std::cout << "returning this->_node = " << this->_node << "\n";
 					return (*this);
 				}
 				// this->node is the rightmost node of its branch. Gotta look
 				// for a bigger parent.
 				// While the parent is smaller than the child, go up...
-				while (this->_node->parent && this->_node->parent->right == this->_node)
-					{ this->_node = this->_node->parent; }
-				// then go to that parent
+				while (this->_node->parent)
+				{
+					if (this->_node->parent->right == this->_node)
+						this->_node = this->_node->parent;
+				}
+				// then go to that parent's parent
 				this->_node = this->_node->parent;
 				// if we haven't found a bigger parent, return init
 				if (this->_node == NULL) { this->_node = this->_tree->getInit(); }
@@ -191,6 +207,8 @@ namespace ft
 
 			T & operator*() const { return (this->_node->elem); }
 			T * operator->() const { return (&(this->_node->elem)); }
+			Node * getNode() const { return (this->_node); }
+			void	setNode(Node * node) { this->_node = node; }
 	}; // bst_iterator
 
 	template <typename T, typename Compare>
@@ -410,20 +428,20 @@ namespace ft
 
 			bool remove(const value_type & val)
 			{
-				std::cout << "===============================\n";
-				printTree();
-				std::cout << "===============================\n";
+//				std::cout << "===============================\n";
+//				printTree();
+//				std::cout << "===============================\n";
 				bool ret = remove(_root, val);
 //				return (remove(_root, val));
-				std::cout << "===============================\n";
-				printTree();
-				std::cout << "===============================\n";
+//				std::cout << "===============================\n";
+//				printTree();
+//				std::cout << "===============================\n";
 				return (ret);
 			}
 
 			bool remove(Node * root, const value_type & val)
 			{
-				std::cout << "-----\nIn remove, target = " << val.first << "\n";
+//				std::cout << "-----\nIn remove, target = " << val.first << "\n";
 				if (root == NULL) { return (false); } Node * head = root;
 				// go through the tree and find the matching key
 				while (head)
@@ -435,21 +453,20 @@ namespace ft
 					else
 						head = head->right;
 				}
-
-				if (head == NULL) { std::cout << "\tHead == NULL, returning\n" << "\n"; }
-				else {
-					std::cout << "\tHead arrived to : " << head << ", "<< head->elem.first
-						<< ", " << head->elem.second << "\n";
-				}
+//				if (head == NULL) { std::cout << "\tHead == NULL, returning\n" << "\n"; }
+//				else {
+//					std::cout << "\tHead arrived to : " << head << ", "<< head->elem.first
+//						<< ", " << head->elem.second << "\n";
+//				}
 
 				// if no node with a matching key was not found, return
 				if (head == NULL) { return (false); }
 				// save some info needed to rearrange the tree...
 				Node *leftchild = head->left, *rightchild = head->right;
-				std::cout << "leftchild = " << leftchild << ", rightchild = " << rightchild
-					<< "\n";
+//				std::cout << "leftchild = " << leftchild << ", rightchild = " << rightchild
+//					<< "\n";
 				Node *parent = head->parent;
-				std::cout << "parent = " << parent << "\n";
+//				std::cout << "parent = " << parent << "\n";
 				bool headside = 0; // the node's position relative to its parent
 
 				if (parent)
@@ -459,58 +476,45 @@ namespace ft
 					else if (parent->right == head)
 						{ parent->right = NULL; headside = 1; }
 				}
-//				std::cout << "After zeroing, parent (" << parent << ") left = "
-//					<< parent->left << ", right = " << parent->right << "\n";
-
-
-//				if (parent)
-//				{
-//					std::cout << "parent = " << parent << "parent->left = "
-//					<< parent->left << ", " << "parent->right = " << parent->right << "\n";
-//					std::cout << "head = " << head << "\n";
-//					if (parent->left == head)
-//					{
-//						headside = 0;
-//					}
-//					else { headside = 1; }
-//					std::cout << "\theadside = " << headside << "\n";
-//				}
-//				// just zeroing the parent's pointer to the node
-//				if (parent) 
-//				{
-//					std::cout << "\tzeroing parent branch\n";
-//					if (headside == 0) { parent->left = NULL; }
-//					else { parent->right = NULL; }
-//					std::cout << "parent->left = " << parent->left
-//						<< ", parent->right = " << parent->right << "\n";
-//				}
 
 				// deleting the node
-				std::cout << "\tdeallocating " << head << "\n";
-				Node * to_free = head;
+//				std::cout << "\tdeallocating " << head << "\n";
 				_node_alloc.destroy(head); _node_alloc.deallocate(head, 1); head = NULL;
-				std::cout << "\tdeallocated, headside = " << headside << "\n";
+//				std::cout << "\tdeallocated, headside = " << headside << "\n";
 
 				// if the deleted node was not a leaf, rearrange the tree :
 				Node * substitute; bool subtreeside;
 				if (leftchild)
 				{
-					std::cout << "\t\tfinding max in leftchild...";
+//					std::cout << "\t\tfinding max in leftchild...";
 					substitute = find_max(leftchild); subtreeside = 0;
-					std::cout << " substitute = " << substitute->elem.first
-						<< ", " << substitute->elem.second << "\n";
+//					std::cout << " substitute = " << substitute->elem.first
+//						<< ", " << substitute->elem.second << "\n";
 				}
 				else if (rightchild)
 				{
-					std::cout << "\t\tfinding min in rightchild...";
+//					std::cout << "\t\tfinding min in rightchild...";
 					substitute = find_min(rightchild); subtreeside = 1;
-					std::cout << " substitute = " << substitute->elem.first
-						<< ", " << substitute->elem.second << "\n";
+//					std::cout << " substitute = " << substitute->elem.first
+//						<< ", " << substitute->elem.second << "\n";
 				}
 				else // no subtrees means we removed a leaf node
 				{
-					std::cout << "\tjust deleted a leaf, returning...\n";
-					return (true); // no repositioning needed
+//					std::cout << "\tjust deleted a leaf, returning...\n";
+//					std::cout << "\tparent = " << parent << "\n";
+//					std::cout << "\thead = " << head << "\n";
+					if (parent != NULL) // if leaf had a parent, it wasn't _root
+					{
+						if (headside == 0)
+							parent->left = NULL;
+						else
+							parent->right = NULL;
+					}
+					else // if lead had no parent, it was _root.
+					{
+						_root = NULL; head = _root;
+					}
+					return (true); // no rearranging needed
 				}
 
 				if (parent != NULL)
@@ -541,9 +545,10 @@ namespace ft
 				if (leftchild) { leftchild->parent = head; }
 				if (rightchild) { rightchild->parent = head; }
 
-				std::cout << "Substituted the deleted node. Printing :\n";
-				printTree();
-				std::cout << "Removing the double...\n";
+//				std::cout << "Substituted the deleted node. Printing :\n";
+//				printTree();
+//				std::cout << "Removing the double...\n";
+
 				// now that we have copied the substitute in the deleted
 				// node's place, we remove the original down in the subtree
 				if (subtreeside == 0)
@@ -580,24 +585,20 @@ namespace ft
 
 			void printTree(Node *node, int space) const
 			{
-				if (node)
+				if (node == NULL)
 				{
-					if (node->right) { printTree(node->right, 0); }
+					for (int i = 0; i < space; i++) { std::cout << "\t\t\t"; }
+					std::cout << "0x0\n";
+					return ;
 				}
-//				std::cout << node->elem.first << ", " <<  node->elem.second
-//					<< " [" << node << "]\n";
-//				if (!node) { return ; }
-//				if (node->right)
-//				{
-//					printTree(node->right, space + 1);
-//				}
-//				for (int i = 0; i < space; i++) { std::cout << "\t"; }
-//				std::cout << node->elem.first << ", " <<  node->elem.second
-//					<< " [" << node << "]\n";
-//				if (node->left)
-//				{
-//					printTree(node->right, space + 1);
-//				}
+
+				printTree(node->right, space + 1);
+
+				for (int i = 0; i < space; i++) { std::cout << "\t\t\t"; }
+				std::cout << node << " : " << node->elem.first << " | " \
+					<< node->elem.second << "\n";
+
+				printTree(node->left, space + 1);
 			}
 
 			void printTree(Node * node) const { printTree(node, 0); }
@@ -686,11 +687,18 @@ namespace ft
 
 			iterator begin()
 			{
+//				std::cout << "sfsg1\n";
 				Node *head = _tree.getRoot();
+//				std::cout << "sfsg2\n";
 				if (!head) { return (iterator(&_tree, _tree.getInit())); }
+//				std::cout << "sfsg3\n";
+//				std::cout << "head= " << head << "\n";
+//				std::cout << "head->left = " << head->left << "\n";
 				while (head->left) { head = head->left; }
+//				std::cout << "sfsg4\n";
 				return (iterator(&_tree, head));
 			}
+
 			iterator begin() const { Node *head = _tree.getRoot();
 				if (!head) { return (const_iterator(&_tree, _tree.getInit())); }
 				while (head->left) { head = head->left; }
@@ -734,7 +742,7 @@ namespace ft
 
 			void erase(const Key & k)
 			{
-				std::cout << "Calling erase on key : " << k << "\n";
+//				std::cout << "\tcallling erase on key : " << k << "\n";
 				_tree.remove(ft::make_pair(k, mapped_type()));
 			}
 
@@ -742,11 +750,35 @@ namespace ft
 			{
 				while (first != last)
 				{
-					std::cout << "sfsg\n";
-					std::cout << "erasing : " << (*first).first << "\n";
-					erase((*first).first);
-					std::cout << "about to ++first....\n";
-					++first;
+					iterator tmp(first); ++first; Key k = (*first).first;
+//					std::cout << "++Key = " <<  k << "\n";
+//					std::cout << "(*tmp).first = " << (*tmp).first << "\n";
+					erase((*tmp).first);
+					first = find(k);
+
+
+//					std::cout << "in erase, erasing (*first).first = " << (*first).first << "\n";
+//					std::cout << "-------------------\n";
+//					this->_tree.printTree();
+//					std::cout << "-------------------\n";
+//					parent = first.getNode()->parent;
+//					std::cout << "parent = " << parent << "\n";
+//					erase((*first).first);
+//					std::cout << "Done erasing\n";
+//					std::cout << "-------------------\n";
+//					this->_tree.printTree();
+//					std::cout << "-------------------\n";
+//					std::cout << "Resetting iterator...\n";
+//					std::cout << "parent = " << parent << "\n";
+//					if (parent == NULL)
+//					{
+//						first.setNode(this->_tree.getRoot);
+//						if (first.getNode() != NULL)
+//						{
+//							if (first.getNode()->right)
+//						}
+//					}
+//					first.setNode(parent);
 				}
 			}
 
@@ -878,7 +910,12 @@ namespace ft
 			pair<iterator, iterator> equal_range(const key_type & k)
 			{ return (ft::make_pair(lower_bound(k), upper_bound(k))); }
 
-			void printMap() const { _tree.printTree(); }
+			void printMap() const
+			{
+				std::cout << "-------------------------\n";
+				_tree.printTree(); 
+				std::cout << "-------------------------\n";
+			}
 
 	}; // class map
 
