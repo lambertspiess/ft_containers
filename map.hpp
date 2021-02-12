@@ -6,7 +6,7 @@
 /*   By: lspiess <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 17:45:17 by lspiess           #+#    #+#             */
-/*   Updated: 2021/02/12 21:44:29 by lspiess          ###   ########.fr       */
+/*   Updated: 2021/02/12 22:09:10 by lspiess          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -396,6 +396,7 @@ namespace ft
 					_node_alloc.construct(_root, Node(val, NULL, NULL, NULL));
 					return (make_pair(iterator(this, _root), true));
 				}
+				// find out about infinite loop in insert
 				while (1)
 				{
 					// if the current node's key is same as our value's key
