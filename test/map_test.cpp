@@ -169,65 +169,64 @@ int main()
 //		std::cout << "std's max size: " << ori.max_size() << std::endl;
 //		std::cout << std::endl;
 //
-		title("operator[] test");
-		red("ft");
-		print(my);
-		blue("char op = my[7]\nif input key doesnt exist, insert key");
-		char op = my[7];
-		print(my);
-
-		red("std");
-		print(ori);
-		op = ori[7];
-		yellow("char op = ori[7]\nif input key doesnt exist, insert key");
-		print(ori);
-		std::cout << std::endl;
-
-		title("insert(val)");
-		blue("my.insert(ft::make_pair(10, h))");
-		my.insert(ft::make_pair(10, 'h'));
-		print(my);
-		yellow("ori.insert(std::make_pair(10, h))");
-		ori.insert(std::make_pair(10, 'h'));
-		print(ori);
-
-		red("insert already exist key\n");
-		blue("my.insert(ft::make_pair(3, h))");
-		my.insert(ft::make_pair(3, 'h'));
-		print(my);
-		
-		yellow("ori.insert(std::make_pair(3, h))");
-		ori.insert(std::make_pair(3, 'h'));
-		print(ori);
-
-		title("insert(position, val)");
-		red("ft::map<int, char>::iterator myIter = my.begin();\nit++;it++it++");
-		ft::map<int, char>::iterator ftIter = my.begin();
-		ftIter++; ftIter++; ftIter++;
-		blue("my.insert(myIter, ft::make_pair(15, 'z'));");
-		my.insert(ftIter, ft::make_pair(15, 'z'));
-		print(my);
-
-		std::map<int, char>::iterator stdIter = ori.begin();
-		stdIter++; stdIter++; stdIter++;
-		ori.insert(stdIter, std::make_pair(15, 'z'));
-		print(ori);
-
-		// infinite loop here
-		title("insert(first, last)");
-		ft::map<int, char> my2(ft2_pair, ft2_pair + 5);
-		std::map<int, char> ori2(std2_pair, std2_pair + 5);
-		red("my2");
-		print(my2);
-		red("ori2");
-		print(ori2);
-		blue("my.insert(my2.begin(), my2.end())");
-		my.insert(my2.begin(), my2.end());
-		print(my);
-		yellow("ori.insert(ori2.begin(), ori2.end())");
-		ori.insert(ori2.begin(), ori2.end());
-		print(ori);
-
+//		title("operator[] test");
+//		red("ft");
+//		print(my);
+//		blue("char op = my[7]\nif input key doesnt exist, insert key");
+//		char op = my[7];
+//		print(my);
+//
+//		red("std");
+//		print(ori);
+//		op = ori[7];
+//		yellow("char op = ori[7]\nif input key doesnt exist, insert key");
+//		print(ori);
+//		std::cout << std::endl;
+//
+//		title("insert(val)");
+//		blue("my.insert(ft::make_pair(10, h))");
+//		my.insert(ft::make_pair(10, 'h'));
+//		print(my);
+//		yellow("ori.insert(std::make_pair(10, h))");
+//		ori.insert(std::make_pair(10, 'h'));
+//		print(ori);
+//
+//		red("insert already exist key\n");
+//		blue("my.insert(ft::make_pair(3, h))");
+//		my.insert(ft::make_pair(3, 'h'));
+//		print(my);
+//		
+//		yellow("ori.insert(std::make_pair(3, h))");
+//		ori.insert(std::make_pair(3, 'h'));
+//		print(ori);
+//
+//		title("insert(position, val)");
+//		red("ft::map<int, char>::iterator myIter = my.begin();\nit++;it++it++");
+//		ft::map<int, char>::iterator ftIter = my.begin();
+//		ftIter++; ftIter++; ftIter++;
+//		blue("my.insert(myIter, ft::make_pair(15, 'z'));");
+//		my.insert(ftIter, ft::make_pair(15, 'z'));
+//		print(my);
+//
+//		std::map<int, char>::iterator stdIter = ori.begin();
+//		stdIter++; stdIter++; stdIter++;
+//		ori.insert(stdIter, std::make_pair(15, 'z'));
+//		print(ori);
+//
+//		title("insert(first, last)");
+//		ft::map<int, char> my2(ft2_pair, ft2_pair + 5);
+//		std::map<int, char> ori2(std2_pair, std2_pair + 5);
+//		red("my2");
+//		print(my2);
+//		red("ori2");
+//		print(ori2);
+//		blue("my.insert(my2.begin(), my2.end())");
+//		my.insert(my2.begin(), my2.end());
+//		print(my);
+//		yellow("ori.insert(ori2.begin(), ori2.end())");
+//		ori.insert(ori2.begin(), ori2.end());
+//		print(ori);
+//
 //		title("erase(position)");
 //		blue("my.erase(my.begin())");
 //		my.erase(my.begin());
@@ -252,23 +251,20 @@ int main()
 //		yellow("ori.erase(ori.begin(), ++ori.begin())");
 //		ori.erase(ori.begin(), ++ori.begin());
 //		print(ori);
-//
+
 //		title("swap test");
-//		red("my");
-//		print(my);
-//		blue("my2");
-//		print(my2);
 //		cyan("my.swap(my2)");
+//		red("my"); print(my); blue("my2"); print(my2);
 //		my.swap(my2);
-//		red("my");
-//		print(my);
-//		blue("my2");
-//		print(my2);
-//		
-//		ori.swap(ori2);
-//		yellow("ori.swap(ori2)");
-//		print(ori);
+//		red("my"); print(my); blue("my2"); print(my2);
 //
+//		yellow("ori.swap(ori2)");
+//		yellow("ori"); print(ori);
+//		yellow("ori2"); print(ori2);
+//		ori.swap(ori2);
+//		yellow("ori"); print(ori);
+//		yellow("ori2"); print(ori2);
+
 //		title("clear test");
 //		blue("my2.clear()");
 //		my2.clear();

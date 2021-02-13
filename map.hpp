@@ -6,7 +6,7 @@
 /*   By: lspiess <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 17:45:17 by lspiess           #+#    #+#             */
-/*   Updated: 2021/02/12 22:09:10 by lspiess          ###   ########.fr       */
+/*   Updated: 2021/02/13 22:14:15 by lspiess          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,9 +119,9 @@ namespace ft
 			bst_iterator & operator++(void)
 			{
 				Node *root = this->_tree->getRoot();
-//				std::cout << "in increment, root = " << root
-//							<< ", this->_node = " << this->_node << "\n";
-//				std::cout << "root->elem.first = " << root->elem.first << "\n";
+
+//				std::cout << "\tsfsg 1\n";
+
 				 // if tree is empty, iterator will point to the init node
 				if (root == NULL)
 				{
@@ -129,6 +129,9 @@ namespace ft
 //					std::cout << "this->_node = this->_tree->getInit() = " << this->_node << "\n";
 					return (*this);
 				}
+
+//				std::cout << "\tsfsg 2\n";
+
 				// if _node is NULL or out of bounds, go to the smallest node
 				if (this->_node == NULL || this->_node == this->_tree->getInit())
 				{
@@ -141,6 +144,9 @@ namespace ft
 					}
 					return (*this);
 				}
+
+//				std::cout << "\tsfsg 3\n";
+
 				// if there is a subtree on the right...
 				if (this->_node->right != NULL)
 				{
@@ -152,6 +158,9 @@ namespace ft
 //					std::cout << "returning this->_node = " << this->_node << "\n";
 					return (*this);
 				}
+
+//				std::cout << "\tsfsg 4\n";
+
 				// this->node is the rightmost node of its branch. Gotta look
 				// for a bigger parent.
 				// While the parent is smaller than the child, go up...
@@ -159,16 +168,28 @@ namespace ft
 				{
 					if (this->_node->parent->right == this->_node)
 						this->_node = this->_node->parent;
+					else
+						break ;
 				}
+
+//				std::cout << "\tsfsg 5\n";
+
 				// then go to that parent's parent
 				this->_node = this->_node->parent;
+
+//				std::cout << "\tsfsg 6\n";
+
 				// if we haven't found a bigger parent, return init
 				if (this->_node == NULL) { this->_node = this->_tree->getInit(); }
 				return (*this);
 			}
 
 			bst_iterator operator++(int)
-				{ bst_iterator ret(*this); operator++(); return (ret); }
+			{
+				bst_iterator ret(*this);
+				operator++();
+				return (ret);
+			}
 
 			bst_iterator &operator--(void)
 			{
@@ -209,6 +230,7 @@ namespace ft
 			T * operator->() const { return (&(this->_node->elem)); }
 			Node * getNode() const { return (this->_node); }
 			void	setNode(Node * node) { this->_node = node; }
+			Node * getInit() const { return (this->_tree->getInit()); }
 	}; // bst_iterator
 
 	template <typename T, typename Compare>
@@ -574,12 +596,14 @@ namespace ft
 
 			size_type getTreeSize(Node *node) const
 			{
+//				std::cout << "SFSG getTreeSize()\n";
 				if (node == NULL) { return (0); }
 				return (1 + getTreeSize(node->left) + getTreeSize(node->right));
 			}
 
 			size_type getSize() const
 			{
+//				std::cout << "SFSG getsize()\n";
 				Node * node = _root;
 				return (getTreeSize(node));
 			}
@@ -715,7 +739,11 @@ namespace ft
 
 			bool empty() const { return (_tree.getSize() == 0); }
 
-			size_type size() const { return (_tree.getSize()); }
+			size_type size() const
+			{
+//				std::cout << "sfsg size()\n";
+				return (_tree.getSize());
+			}
 
 			size_type max_size() const { return (allocator_type().max_size()); }
 
@@ -749,37 +777,16 @@ namespace ft
 
 			void erase(iterator first, iterator last)
 			{
-				while (first != last)
+				while (1)
 				{
 					iterator tmp(first); ++first; Key k = (*first).first;
+//					std::cout << "first.getNode() = " << first.getNode() << "\n";
+//					std::cout << "first.getInit() = " << first.getInit() << "\n";
 //					std::cout << "++Key = " <<  k << "\n";
 //					std::cout << "(*tmp).first = " << (*tmp).first << "\n";
 					erase((*tmp).first);
+					if (first == last) { break ; }
 					first = find(k);
-
-
-//					std::cout << "in erase, erasing (*first).first = " << (*first).first << "\n";
-//					std::cout << "-------------------\n";
-//					this->_tree.printTree();
-//					std::cout << "-------------------\n";
-//					parent = first.getNode()->parent;
-//					std::cout << "parent = " << parent << "\n";
-//					erase((*first).first);
-//					std::cout << "Done erasing\n";
-//					std::cout << "-------------------\n";
-//					this->_tree.printTree();
-//					std::cout << "-------------------\n";
-//					std::cout << "Resetting iterator...\n";
-//					std::cout << "parent = " << parent << "\n";
-//					if (parent == NULL)
-//					{
-//						first.setNode(this->_tree.getRoot);
-//						if (first.getNode() != NULL)
-//						{
-//							if (first.getNode()->right)
-//						}
-//					}
-//					first.setNode(parent);
 				}
 			}
 
@@ -832,73 +839,124 @@ namespace ft
 			iterator lower_bound(const key_type & k)
 			{
 				Node *head = _tree.getRoot(); key_compare comp;
+//				this->_tree.printTree();
+//				std::cout << "_tree.getRoot = " << head << ", "
+//							<< head->elem.first << ", " << head->elem.second << "\n";
 				while (head)
 				{
+//					std::cout << "_tree.getRoot = " << head << ", " << head->elem.first
+//						<< ", " << head->elem.second << "\n";
 					if (head->elem.first == k) { return (iterator(&_tree, head)); }
 					if (comp(head->elem.first, k) == true)
-						head = head->left;
-					else if (head->right)
 					{
+//						std::cout << "going right\n";
 						head = head->right;
+					}
+					else if (head->left)
+					{
+//						std::cout << "going left\n";
+						head = head->left;
 						while (head->left) { head = head->left; }
 						return (iterator(&_tree, head));
 					}
+					else { break ; }
 				}
 				return (end());
 			}
+			// same but const
 			const_iterator lower_bound(const key_type & k) const
 			{
 				Node *head = _tree.getRoot(); key_compare comp;
+//				this->_tree.printTree();
+//				std::cout << "_tree.getRoot = " << head << ", "
+//							<< head->elem.first << ", " << head->elem.second << "\n";
 				while (head)
 				{
+//					std::cout << "_tree.getRoot = " << head << ", " << head->elem.first
+//						<< ", " << head->elem.second << "\n";
 					if (head->elem.first == k) { return (const_iterator(&_tree, head)); }
 					if (comp(head->elem.first, k) == true)
-						head = head->left;
-					else if (head->right)
 					{
+//						std::cout << "going right\n";
 						head = head->right;
+					}
+					else if (head->left)
+					{
+//						std::cout << "going left\n";
+						head = head->left;
 						while (head->left) { head = head->left; }
 						return (const_iterator(&_tree, head));
 					}
+					else { break ; }
+				}
+				return (const_iterator(end()));
+			}
+
+			 // Returns an iterator to the first element whose key is strictly greater than k
+			iterator upper_bound(const key_type & k)
+			{
+				Node *head = _tree.getRoot(); key_compare comp;
+
+				while (head)
+				{
+//					std::cout << "head = " << head << ", " << head->elem.first
+//						<< ", " << head->elem.second << "\n";
+					if (head->elem.first == k)
+					{
+//						std::cout << "Detected equality, going right\n";
+						head = head->right;
+					}
+					else if (comp(head->elem.first, k) == true) // if node key < k
+					{
+//						std::cout << "going right\n";
+						head = head->right;
+					}
+					else if (comp(k, head->elem.first) == true) // if node key >= k
+					{
+//						std::cout << "lala\n";
+						while (head->left)
+						{
+//							std::cout << "going left\n";
+							if (comp(k, head->left->elem.first) == true) // if node->left key > k
+								head = head->left;
+							else
+								break ;
+						}
+						return (iterator(&_tree, head));
+					}
+					else { break ; }
 				}
 				return (end());
 			}
 
-			// return an iterator to the first element equal to or smaller
-			// than key, or end()
-			iterator upper_bound(const key_type & k)
-			{
-				Node *head = _tree.getRoot(); key_compare comp;
-				while (head)
-				{
-					if (head->elem.first == k) { return (iterator(&_tree, head)); }
-					if (comp(k, head->elem.first) == true)
-						head = head->right;
-					else if (head->left)
-					{
-						head = head->left;
-						while (head->right) { head = head->right; }
-						return (iterator(&_tree, head));
-					}
-				}
-				return (end());
-			}
 			const_iterator upper_bound(const key_type & k) const
 			{
 				Node *head = _tree.getRoot(); key_compare comp;
+
 				while (head)
 				{
-					if (head->elem.first == k) { return (const_iterator(&_tree, head)); }
-					if (comp(k, head->elem.first) == true)
-						head = head->right;
-					else if (head->left)
+					if (head->elem.first == k)
 					{
-						head = head->left;
-						while (head->right) { head = head->right; }
+						head = head->right;
+					}
+					else if (comp(head->elem.first, k) == true) // if node key < k
+					{
+						head = head->right;
+					}
+					else if (comp(k, head->elem.first) == true) // if node key >= k
+					{
+						while (head->left)
+						{
+							if (comp(k, head->left->elem.first) == true) // if node->left key > k
+								head = head->left;
+							else
+								break ;
+						}
 						return (const_iterator(&_tree, head));
 					}
+					else { break ; }
 				}
-				return (end());
+				return (const_iterator(end()));
 			}
 
 			// return a pair of iterator that possibly point to the subsequence
