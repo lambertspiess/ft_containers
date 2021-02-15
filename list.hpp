@@ -1,6 +1,8 @@
 #ifndef LIST_HPP
 # define LIST_HPP
 
+# include <string>
+# include <iostream>
 # include "iterators.hpp"
 # include "enable_if.hpp"
 # include <memory>
@@ -292,7 +294,8 @@ namespace ft
 			{
 				iterator next(position.node->next);
 				node * node = position.node; _unlinkNode(node);
-				_node_alloc.destroy(node); _node_alloc.deallocate(node, 1);
+				_node_alloc.destroy(node);
+				_node_alloc.deallocate(node, 1); node = NULL;
 				return (next);
 			}
 
@@ -300,7 +303,11 @@ namespace ft
 			iterator erase(iterator first, iterator last)
 			{
 				iterator itr = first;
-				while (itr != last) { erase(itr); itr++; }
+				while (itr != last)
+				{
+					iterator tmp = itr; ++itr;
+					erase(tmp);
+				}
 				return (iterator(last));
 			}
 
@@ -343,7 +350,8 @@ namespace ft
 
 			void splice(iterator position, list & other, iterator itr)
 			{
-				insert(position, *itr); other.erase(itr);
+				insert(position, *itr);
+				other.erase(itr);
 			}
 
 			void splice(iterator position, list & other, iterator first, iterator last)
@@ -419,16 +427,21 @@ namespace ft
 			void sort(Compare comp)
 			{
 				if (_last->next == _last) { return ; }
-				iterator i, j; i = begin();
+				iterator i = begin(), j;
 				while (i != end())
 				{
 					j = i;
 					while (++j != end())
 					{
-						if (comp(*j, *i)) { splice(i, *this, j); }
+						if (comp(*j, *i))
+						{
+							node * tmp = j.node->next;
+							splice(i, *this, j);
+							j.node = tmp;
+						}
 					}
 					i++;
-				}
+				} 
 			}
 
 			void reverse()
