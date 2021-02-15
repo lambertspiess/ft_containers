@@ -6,7 +6,7 @@
 /*   By: lspiess <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 17:45:17 by lspiess           #+#    #+#             */
-/*   Updated: 2021/02/13 22:14:15 by lspiess          ###   ########.fr       */
+/*   Updated: 2021/02/15 14:09:11 by lspiess          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -590,7 +590,7 @@ namespace ft
 			Node * find_min(Node * root)
 			{
 				Node * head = root; if (root == NULL) { return NULL; }
-				while (head->left) { head = head->right; }
+				while (head->left) { head = head->left; }
 				return (head);
 			}
 
