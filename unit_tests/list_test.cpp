@@ -28,13 +28,13 @@ int main()
 		std::list<int> ori;
 		print_cont(ori);
 		//--------------------------------------------------------------------
-//		highlight("Constructor : fill witn n times val");
-//		cyannl("ft::list<int> my_ctor_nval(8, 42)");
-//		ft::list<int> ctor_nval(8, 42);
-//		print_contnl(ctor_nval);
-//		purplenl("std::list<int> std_ctor_nval(8, 42)");
-//		std::list<int> std_ctor_nval(8, 42);
-//		print_contnl(std_ctor_nval);
+		highlight("Constructor : fill witn n times val");
+		cyannl("ft::list<int> my_ctor_nval(8, 42)");
+		ft::list<int> ctor_nval(8, 42);
+		print_contnl(ctor_nval);
+		purplenl("std::list<int> std_ctor_nval(8, 42)");
+		std::list<int> std_ctor_nval(8, 42);
+		print_contnl(std_ctor_nval);
 		//--------------------------------------------------------------------
 		highlight("Method : Push-back");
 		cyannl("i = 0; while (i < 10) { my.push_back(i); ++i; }");

@@ -126,7 +126,6 @@ namespace ft
 					{
 						swap = itr++;
 						_alloc.construct(_end++, *swap);
-						_alloc.destroy(swap);
 					}
 					_alloc.deallocate(old_start, old_cap);
 				}
@@ -266,22 +265,42 @@ namespace ft
 
 			iterator erase(iterator first, iterator last)
 			{
-				iterator itr = first, tmp;
 				size_type diff = ft::distance(first, last);
+				iterator itr = first, tmp;
 				while (itr != last)
 				{
 					tmp = itr; ++itr;
 					_alloc.destroy(tmp.base());
 				}
+				itr = first;
 				while (last != end())
 				{
-					itr = first;
 					_alloc.construct(itr.base(), *last);
 					_alloc.destroy(last.base());
 					++itr; ++last;
 				}
 				_end -= diff;
 				return (first);
+			}
+
+			void swap(vector & other)
+			{
+				if (*this == other) { return ; }
+
+				allocator_type		swap_alloc = other._alloc;
+				pointer				swap_start = other._start;
+				pointer				swap_end = other._end;
+				pointer				swap_memend = other._memend;
+
+				other._alloc = this->_alloc;
+				other._start = this->_start;
+				other._end = this->_end;
+				other._memend = this->_memend;
+
+				this->_alloc = swap_alloc;
+				this->_start = swap_start;
+				this->_end = swap_end;
+				this->_memend = swap_memend;
 			}
 
 	}; // class vector

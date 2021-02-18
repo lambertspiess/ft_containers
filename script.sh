@@ -21,12 +21,13 @@ do
 			break
 		fi
 	done
+
 	printf "\033c"
 
 	echo -e "${green}================================================${reset}"
 
 	declare -a CONTAINER_NAMES=( 'list' 'stack' 'queue' 'vector' 'map' )
 
-	make N=${CONTAINER_NAMES[$count]}
+	make N=${CONTAINER_NAMES[($input - 1)]}
 
 done

@@ -2,254 +2,220 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include "test.hpp"
+#include "utils.hpp"
 
-template <typename V>
-void print(V& v)
+template <class Cont>
+void print_contnl(Cont & c)
 {
-	std::cout << "\033[1;33;40m==================================\033[0m\n"
-		<< "\033[1;31;40msize: \033[0m" << "\033[1;34;40m" << v.size()
-		<<"\033[0m" << "\033[1;31;40m capacity: \033[0m" << "\033[1;34;40m"
-		<< v.capacity() << std::endl;
-	std::cout << "\033[1;32;40m";
-	typename V::iterator it = v.begin();
-	for (; it != v.end(); ++it)
-		std::cout << *it << " ";
-	std::cout << "\n\033[1;33;40m==================================\033[0m" << std::endl;
+	typename Cont::iterator itr = c.begin(), end = c.end();
+	while (itr != end) { std::cout << *itr << ' '; ++itr; } std::cout << "\n";
+//	std::cout << "size : " << c.size() << ", cap : " << c.capacity() << "\n";
 }
 
 int main(void)
 {
-	ft::vector<int> ftBase;
-	std::vector<int> stdBase;
-	for (int i = 0; i < 10; ++i) {
-		ftBase.push_back(i);
-	}
-	for (int i = 0; i < 10; ++i) {
-		stdBase.push_back(i);
+	ft::vector<int> my_base;
+	for (int i = 0; i < 10; ++i) { my_base.push_back(i); }
+	std::vector<int> std_base;
+	for (int i = 0; i < 10; ++i) { std_base.push_back(i); }
+
+	{
+		highlight("Constructor : empty");
+		cyannl("ft::vector<int> my_empty");
+		ft::vector<int> my_empty;
+		print_contnl(my_empty);
 	}
 
 	{
-		title("default constructor test");
-		red("myvector");
-		ft::vector<int> test;
-		print(test);
+		highlight("Constructor : insert val n times");
+		cyannl("my(10, 42)");
+		ft::vector<int> my(10, 421);
+		print_contnl(my);
+		purplenl("ori(10, 42)");
+		std::vector<int> ori(10, 421);
+		print_contnl(ori);
+		//--------------------------------------------------------------------
+		highlight("Constructor : from a range of iterators");
+		cyannl("ft::vector<int> my2(my.begin(), my.begin() + 6)");
+		ft::vector<int> my2(my.begin(), my.begin() + 6);
+		print_contnl(my2);
+
+		purplenl("std::vector<int> ori2(ori.begin(), ori.begin() + 6)");
+		std::vector<int> ori2(ori.begin(), ori.begin() + 6);
+		print_contnl(ori2);
 	}
 	{
-		title("fill constructor test");
-		blue("my(10, 123)");
-		ft::vector<int> my(10, 123);
-		print(my);
-		yellow("ori(10, 123)");
-		std::vector<int> ori(10, 123);
-		print(ori);
+		highlight("Constructor : copy another container");
+		cyannl("my_base");
+		print_contnl(my_base);
+		cyannl("ft::vector<int> my(my_base)");
+		ft::vector<int> my(my_base);
+		print_contnl(my);
 
-		title("range constructor test");
-		blue("my2(my.begin(), my.begin() + 5)");
-		ft::vector<int> my2(my.begin(), my.begin() + 5);
-		print(my2);
+		purplenl("ori_base");
+		print_contnl(std_base);
+		purplenl("std::vector<int> ori(std_base)");
+		std::vector<int> ori(std_base);
+		print_contnl(ori);
+		//--------------------------------------------------------------------
+		highlight("Operator overload : assignement");
+		cyannl("ft::vector<int> my_assigned = my_base");
+		ft::vector<int> my_assigned = my_base;
+		print_contnl(my_assigned);
 
-		yellow("ori2(ori.begin(), ori.begin() + 5;)");
-		std::vector<int> ori2(ori.begin(), ori.begin() + 5);
-		print(ori2);
-	}
-  {
-		title("copy constructor test");
-		blue("ftBase");
-		print(ftBase);
-		blue("ft::vector<int< my(ftBase)");
-		ft::vector<int> my(ftBase);
-		print(my);
-
-		yellow("std::vector<int> ori(stdBase)");
-		std::vector<int> ori(stdBase);
-		print(stdBase);
-		print(ori);
-
-		title("assign test");
-		blue("ft::vector<int> a; a = ftBase");
-		ft::vector<int> a; a = ftBase;
-		print(a);
-
-		yellow("std::vector<int> o;o = ftBase");
-		std::vector<int> o; o = stdBase;
-		print(o);
-
-		title("max size");
-		std::cout << "ft::vector : " << my.max_size() << std::endl;
-		std::cout << "td::vector : " << ori.max_size() << std::endl;
-
-		title("reserve test");
-		blue("my.reserve(100)");
+		purplenl("std::vector<int> ori_assigned = std_base");
+		std::vector<int> ori_assigned = std_base;
+		print_contnl(ori_assigned);
+		//--------------------------------------------------------------------
+		highlight("Method : max_size");
+		cyan("my.max_size() : "); std::cout << my.max_size() << "\n";
+		purple("ori.max_size() : "); std::cout << ori.max_size() << "\n";
+		//--------------------------------------------------------------------
+		highlight("Method : reserve memory");
+		cyannl("my.reserve(100)");
 		my.reserve(100);
-		print(my);
-
-		yellow("ori.reserve(100)");
+		cyan("my.capacity() : "); std::cout << my.capacity() << "\n";
+		purplenl("ori.reserve(100)");
 		ori.reserve(100);
-		print(ori);
-
-		title("element access test");
-		std::cout << "my.front(): " << my.front() << std::endl;
-		std::cout << "my.back(): " << my.back() << std::endl;
-		std::cout << "ori.front(): " << ori.front() << std::endl;
-		std::cout << "ori.back(): " << ori.back() << std::endl;
-
-		title("at test");
-		blue("my.at(11)");
+		purple("ori.capacity() : "); std::cout << ori.capacity() << "\n";
+		//--------------------------------------------------------------------
+		highlight("Method : front, back");
+		cyan("my.front() : "); std::cout << my.front() << "\n";
+		cyan("my.back() : "); std::cout << my.back() << "\n";
+		cyan("ori.front() : "); std::cout << ori.front() << "\n";
+		cyan("ori.back() : "); std::cout << ori.back() << "\n";
+		//--------------------------------------------------------------------
+		highlight("Method : at");
+		cyannl("my.at(42)");
 		try
-		{
-			my.at(11);
-		}
-		catch (std::out_of_range& e)
-		{
-			std::cout <<e.what() << std::endl;
-		}
+			{ my.at(42); }
+		catch (std::out_of_range & errmsg)
+			{ std::cout << errmsg.what() << std::endl; }
+		//--------------------------------------------------------------------
+		highlight("Method : insert elem at position");
+		cyan("my : "); print_contnl(my);
+		cyannl("my.insert(my.begin() + 3, 9000)");
+		my.insert(my.begin() + 3, 9000);
+		print_contnl(my);
 
-		title("single element insert(position, val)");
-		print(my);
-		blue("my.insert(my.begin() + 5, 1000)");
-		my.insert(my.begin() + 5, 1000);
-		print(my);
+		purple("ori : "); print_contnl(ori);
+		purplenl("ori.insert(ori.begin() + 3, 9000)");
+		ori.insert(ori.begin() + 3, 9000);
+		print_contnl(ori);
+		//--------------------------------------------------------------------
+		highlight("Method : insert n times at position");
+		cyannl("my.insert(my.begin() + 6, 3, 666)");
+		my.insert(my.begin() + 6, 3, 666);
+		print_contnl(my);
 
-		yellow("ori.insert(ori.begin() + 5, 1000)");
-		print(ori);
-		ori.insert(ori.begin() + 5, 1000);
-		print(ori);
+		purplenl("ori.insert(ori.begin() + 6, 3, 666)");
+		ori.insert(ori.begin() + 6, 3, 666);
+		print_contnl(ori);
+		//--------------------------------------------------------------------
+		highlight("Method : insert a range of iterators at position");
+		cyannl("my.insert(my.end(), my.begin() + 6, my.begin() + 9)");
+		my.insert(my.end(), my.begin() + 6, my.begin() + 9);
+		print_contnl(my);
 
-		title("fill insert(position, n, val)");
-		blue("my.insert(my.begin(), 3, 100)");
-		my.insert(my.begin(), 3, 100);
-		print(my);
-
-		yellow("ori.insert(ori.begin(), 3, 100)");
-		ori.insert(ori.begin(), 3, 100);
-		print(ori);
-
-		title("range insert(position, first, last)");
-		blue("my.insert(my.end(), my.begin(), my.begin() + 3)");
-		my.insert(my.end(), my.begin(), my.begin() + 3);
-		print(my);
-
-		yellow("ori.insert(ori.end(), ori.begin(), ori.begin() + 3)");
-		ori.insert(ori.end(), ori.begin(), ori.begin() + 3);
-		print(ori);
-
-		title("push_back test");
-		blue("my.push_back 0 to 9");
-		for (int i = 0; i < 10; i++)
+		purplenl("ori.insert(ori.end(), ori.begin() + 6, ori.begin() + 9)");
+		ori.insert(ori.end(), ori.begin() + 6, ori.begin() + 9);
+		print_contnl(ori);
+		//--------------------------------------------------------------------
+		highlight("Method : push_back");
+		cyannl("my.push_back 90 to 99");
+		for (int i = 90; i <= 99; i++)
 			my.push_back(i);
-		print(my);
-		yellow("ori.push_back 0 to 9");
-		for (int i = 0; i < 10; i++)
+		print_contnl(my);
+		purplenl("ori.push_back 90 to 99");
+		for (int i = 90; i <= 99; i++)
 			ori.push_back(i);
-		print(ori);
-		
-		title("pop_back test");
-		blue("my.pop_back 10 times");
-		print(my);
+		print_contnl(ori);
+		//--------------------------------------------------------------------
+		highlight("Method : pop_back");
+		cyannl("my.pop_back 10 times");
 		for (int i = 0; i < 10; i++)
 			my.pop_back();
-		print(my);
+		print_contnl(my);
 
-		yellow("ori.pop_back 10 times");
-		print(ori);
+		purplenl("ori.pop_back 10 times");
 		for (int i = 0; i < 10; i++)
 			ori.pop_back();
-		print(ori);
+		print_contnl(ori);
+		//--------------------------------------------------------------------
+		highlight("Method : assign container to a range of iterators");
+		ft::vector<int> my_assign;
+		for (int i = 0; i < 10; i++) { my_assign.push_back(i); }
+		cyannl("ft::vector<int> my_assign : "); print_contnl(my_assign);
+		my_assign.assign(my.begin(), my.end());
+		cyannl("my_assign.assign(my.begin(), my.end())");
+		print_contnl(my_assign);
 
-		title("range assign test");
-		ft::vector<int> my2;
-		for (int i = 0; i < 10; i++)
-			my2.push_back(i);
-		blue("my");
-		print(my);
-		blue("my2");
-		print(my2);
-		blue("my2.assign(my.begin(), my.end())");
-		my2.assign(my.begin(), my.end());
-		print(my2);
+		std::vector<int> ori_assign;;
+		for (int i = 0; i < 10; i++) { ori_assign.push_back(i); }
+		purplenl("ft::vector<int> ori_assign : "); print_contnl(ori_assign);
+		ori_assign.assign(ori.begin(), ori.end());
+		purplenl("ori_assign.assign(ori.begin(), ori.end())");
+		print_contnl(ori_assign);
+		//--------------------------------------------------------------------
+		highlight("Method : self assign");
+		cyannl("my_assign.assign(my_assign.begin(), my_assign.end())");
+		my_assign.assign(my_assign.begin(), my_assign.end());
+		print_contnl(my_assign);
 
-		std::vector<int> ori2;
-		blue("ori2");
-		for (int i = 0; i < 10; i++)
-			ori2.push_back(i);
-		yellow("ori");
-		print(ori);
-		yellow("ori2");
-		print(ori2);
-		ori2.assign(ori.begin(), ori.end());
-		print(ori2);
+		purplenl("ori_assign.assign(ori_assign.begin(), ori_assign.end())");
+		ori_assign.assign(ori_assign.begin(), ori_assign.end());
+		print_contnl(ori_assign);
+		//--------------------------------------------------------------------
+		highlight("Method : fill assign test");
+		ft::vector<int> my_fill;
+		cyannl("my_fill");
+		for (int i = 0; i < 10; i++) { my_fill.push_back(i); }
+		print_contnl(my_fill);
+		cyannl("my_fill.assign(3, 42)");
+		my_fill.assign(3, 42);
+		print_contnl(my_fill);
 
-		title("range self assign test");
-		blue("my2");
-		print(my2);
-		blue("my2.assign(my2.begin(), my2.end())");
-		my2.assign(my2.begin(), my2.end());
-		print(my2);
+		std::vector<int> std_fill;
+		purplenl("std_fill");
+		for (int i = 0; i < 10; i++) { std_fill.push_back(i); }
+		print_contnl(std_fill);
+		purplenl("std_fill.assign(3, 42)");
+		std_fill.assign(3, 42);
+		print_contnl(std_fill);
+		//--------------------------------------------------------------------
+		highlight("Method : erase test");
+		cyannl("before :"); print_contnl(my_assign);
+		purplenl("before :"); print_contnl(ori_assign);
 
-		blue("ori2");
-		print(ori2);
-		ori2.assign(ori2.begin(), ori2.end());
-		print(ori2);
+		cyannl("my_assign.erase(my_assign.begin(), my_assign.begin() + 3)");
+		my_assign.erase(my_assign.begin(), my_assign.begin() + 3);
+		print_contnl(my_assign);
 
-		title("fill assign test");
-		ft::vector<int> my3;
-		blue("my3");
-		for (int i = 0; i < 10; i++)
-			my3.push_back(i);
-		print(my3);
-		blue("my3.assign(10, 0)");
-		my3.assign(10, 0);
-		print(my3);
-
-		std::vector<int> ori3;
-		blue("ori3");
-		for (int i = 0; i < 10; i++)
-			ori3.push_back(i);
-		print(ori3);
-		ori3.assign(10, 0);
-		print(ori3);
-
-		title("erase test");
-		blue("my2.erase(my2.begin(), my2.begin() + 3)");
-		print(my2);
-		my2.erase(my2.begin(), my2.begin() + 3);
-		print(my2);
-
-		yellow("ori2.erase(ori2.begin(), ori2.begin() + 3)");
-		print(ori2);
-		ori2.erase(ori2.begin(), ori2.begin() + 3);
-		print(ori2);
-
-
-		title("swap test");
-		blue("my2");
-		print(my2);
-		blue("my3");
-		print(my3);
-		swap(my2, my3);
-		blue("my2");
-		print(my2);
-		blue("my3");
-		print(my3);
-
-		yellow("ori2");
-		print(ori2);
-		yellow("ori3");
-		print(ori3);
-		swap(ori2, ori3);
-		yellow("ori2");
-		print(ori2);
-		yellow("ori3");
-		print(ori3);
-
-		title("clear test");
-		blue("my.clear()");
+		purplenl("ori_assign.erase(ori_assign.begin(), ori_assign.begin() + 3)");
+		ori_assign.erase(ori_assign.begin(), ori_assign.begin() + 3);
+		print_contnl(ori_assign);
+		//--------------------------------------------------------------------
+		highlight("Method : swap");
+		ft::vector<int> v1, v2;
+		for (int i = 0; i < 10; i++) { v1.push_back(i); v2.push_back(100 + 2 * i); }
+		cyannl("v1");
+		print_contnl(v1);
+		cyannl("v2");
+		print_contnl(v2);
+		cyannl("v1.swap(v2)");
+		v1.swap(v2);
+		cyannl("v1");
+		print_contnl(v1);
+		cyannl("v2");
+		print_contnl(v2);
+		//--------------------------------------------------------------------
+		highlight("Method : clear");
+		cyannl("my.clear()");
 		my.clear();
-		print(my);
-		
-		yellow("ori.clear()");
+		print_contnl(my);
+
+		purplenl("ori.clear()");
 		ori.clear();
-		print(ori);
+		print_contnl(ori);
 	}
 }
