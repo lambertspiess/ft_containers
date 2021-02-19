@@ -1,15 +1,14 @@
-#include "../vector.hpp"
 #include <iostream>
 #include <vector>
 #include <string>
 #include "utils.hpp"
+#include "../vector.hpp"
 
 template <class Cont>
 void print_contnl(Cont & c)
 {
 	typename Cont::iterator itr = c.begin(), end = c.end();
 	while (itr != end) { std::cout << *itr << ' '; ++itr; } std::cout << "\n";
-//	std::cout << "size : " << c.size() << ", cap : " << c.capacity() << "\n";
 }
 
 int main(void)

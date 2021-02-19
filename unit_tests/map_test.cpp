@@ -5,26 +5,87 @@
 #include <string>
 #include "test.hpp"
 
-//// print begin to end
-//template <typename M>
-//void print(M& a);
-//
-//// print forwardly it to last
-//template <class Iter>
-//void iterPrint(Iter it, Iter last);
-//
-//// print backwardly it to last
-//template <class Iter>
-//void iterBack(Iter it, Iter last);
-//
-//// print key, value
-//template <class Iter>
-//void key_value(Iter it);
-//// print size
-//
-//template <class M>
-//void printSize(M& a);
-//
+template <class Cont>
+void printMap(Cont & c)
+{
+	Cont::iterator begin = c.begin(), end = c.end();
+	while (begin != end)
+	{
+		std::cout << begin->first << ":" << begin->second << ", ";
+		++begin;
+	}
+	std::cout << "\n";
+}
+
+template <class Iter>
+void printMapRange(Iter begin, Iter end)
+{
+	while (begin != end)
+	{
+		std::cout << begin->first << ":" << begin->second << ", ";
+		++begin;
+	}
+	std::cout << "\n";
+}
+
+template <class Iter>
+void printMapRangeRev(Iter begin, Iter end)
+{
+	while (begin != end)
+	{
+		std::cout << begin->first << ":" << begin->second << ", ";
+		--begin;
+	}
+	std::cout << "\n";
+}
+
+template <class Iter>
+void printPairnl(Iter itr)
+{ std::cout << itr->first << ":" << itr->second << "\n"; }
+
+template <class Iter>
+void printPair(Iter itr)
+{ std::cout << itr->first << ":" << itr->second; }
+
+
+template <class Iter>
+void printMaprtl(Iter left, Iter right)
+{
+	while (right != left)
+	{
+		std::cout << right->first << ":" << left->second << ", ";
+		++left;
+	}
+	std::cout << "\n";
+}
+
+template <class Iter>
+void printMapRangeRev(Iter itr, Iter last)
+{
+	while (itr != last)
+	{
+		std::cout << itr->first << ":" << itr->second << ", ";
+		--itr;
+	}
+	std::cout << "\n";
+}
+
+template <class Cont>
+void printMap(Cont & c)
+{
+	typename Cont::iterator begin = c.begin(), end = c.end();
+	printmaprange(begin, end);
+}
+
+template <class Cont>
+void printMapRev(Cont & c)
+{
+	typename Cont::iterator begin = c.end(), end = c.begin();
+	printMapRangeRev(begin, end);
+}
+
+	//--------------------------------------------------------------------
+
 template <typename M>
 void print(M & a)
 {
