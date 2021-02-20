@@ -1,5 +1,9 @@
 #include <string>
 #include <iostream>
+#include <utility>
+#include <string>
+#include <iostream>
+#include <random>
 
 void red(const std::string & s);
 void green(const std::string & s);

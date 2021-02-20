@@ -1,8 +1,5 @@
 #include "../map.hpp"
-#include <iostream>
 #include <map>
-#include <utility>
-#include <string>
 #include "utils.hpp"
 
 template <class Iter>
@@ -38,46 +35,41 @@ template <class Cont>
 void printMapSizenl(Cont & c)
 	{ std::cout << "size : " << c.size() << "\n"; }
 
-
-//-----------------------------------------------------------------------------
 int main()
 {
-	ft::pair<int, char> ft_pairs[] = {
-		ft::make_pair(1, 'a'),
-		ft::make_pair(2, 'b'),
-		ft::make_pair(3, 'c'),
-		ft::make_pair(4, 'd'),
-		ft::make_pair(5, 'e')};
+	ft::pair<int, char> ft_pairs[] =
+	{
+		ft::make_pair(1, 'a'), ft::make_pair(2, 'b'), ft::make_pair(3, 'c'),
+		ft::make_pair(4, 'd'), ft::make_pair(5, 'e')
+	};
 
-	ft::pair<int, char> ft2_pairs[] = {
-		ft::make_pair(3, 'a'),
-		ft::make_pair(5, 'b'),
-		ft::make_pair(7, 'c'),
-		ft::make_pair(9, 'd'),
-		ft::make_pair(11, 'e')};
+	ft::pair<int, char> ft2_pairs[] =
+	{
+		ft::make_pair(3, 'a'), ft::make_pair(5, 'b'), ft::make_pair(7, 'c'),
+		ft::make_pair(9, 'd'), ft::make_pair(11, 'e')
+	};
 
-	std::pair<int, char> std_pairs[] = {
-		std::make_pair(1, 'a'),
-		std::make_pair(2, 'b'),
-		std::make_pair(3, 'c'),
-		std::make_pair(4, 'd'),
-		std::make_pair(5, 'e')};
+	std::pair<int, char> std_pairs[] =
+	{
+		std::make_pair(1, 'a'), std::make_pair(2, 'b'), std::make_pair(3, 'c'),
+		std::make_pair(4, 'd'), std::make_pair(5, 'e')
+	};
 
-	std::pair<int, char> std2_pairs[] = {
-		std::make_pair(3, 'a'),
-		std::make_pair(5, 'b'),
-		std::make_pair(7, 'c'),
-		std::make_pair(9, 'd'),
-		std::make_pair(11, 'e')};
-
+	std::pair<int, char> std2_pairs[] =
+	{
+		std::make_pair(3, 'a'), std::make_pair(5, 'b'), std::make_pair(7, 'c'),
+		std::make_pair(9, 'd'), std::make_pair(11, 'e')
+	};
 
 	{
-		highlight("Constructor : empty map");
+		highlight("Constructor : default (empty container)");
 		cyannl("ft::map<int, char> my");
 		ft::map<int, char> my;
+		cyannl("my");
 		printMap(my);
 		purplenl("std::map<int, char> ori");
 		std::map<int, char> ori;
+		purplenl("ori");
 		printMap(ori);
 	}
 
@@ -262,7 +254,7 @@ int main()
 		my2.clear();
 		printMap(my2);
 		std::cout << "my2.size() = " << my2.size() << "\n";
-		purplenl("----------\nori2.clear()");
+		purplenl("ori2.clear()");
 		ori2.clear();
 		printMap(ori2);
 		std::cout << "ori2.size() = " << ori2.size() << "\n";

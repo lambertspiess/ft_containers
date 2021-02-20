@@ -1,8 +1,6 @@
-#include <iostream>
-#include <vector>
-#include <string>
-#include "utils.hpp"
 #include "../vector.hpp"
+#include <vector>
+#include "utils.hpp"
 
 template <class Cont>
 void print_contnl(Cont & c)

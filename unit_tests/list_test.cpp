@@ -1,25 +1,24 @@
 #include "../list.hpp"
 #include <list>
-#include <random>
-#include <iostream>
 #include "utils.hpp"
 
-template <class Cont>
-void print_contnl(Cont & c)
-{
-	typename Cont::iterator itr = c.begin(), end = c.end();
-	while (itr != end) { std::cout << *itr << ' '; ++itr; } std::cout << "\n";
-}
 template <class Cont>
 void print_cont(Cont & c)
 {
 	typename Cont::iterator itr = c.begin(), end = c.end();
 	while (itr != end) { std::cout << *itr << ' '; ++itr; }
 }
+template <class Cont>
+void print_contnl(Cont & c)
+{
+	typename Cont::iterator itr = c.begin(), end = c.end();
+	while (itr != end) { std::cout << *itr << ' '; ++itr; } std::cout << "\n";
+}
 
 int main()
 {
 	{
+		//--------------------------------------------------------------------
 		highlight("Default constructor : empty list");
 		cyannl("ft::list<int> my");
 		ft::list<int> my;

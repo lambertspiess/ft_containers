@@ -1,47 +1,83 @@
-#include <string>
-#include <iostream>
-#include <random>
-#include <stack>
-#include "test.hpp"
 #include "../stack.hpp"
+#include <stack>
+#include "utils.hpp"
 
 int main()
 {
 	{
-		title("Constructor test");
-		blue("ft::stack<int> m;");
-		ft::stack<int> m;
-		yellow("std::stack<int> o;");
-		std::stack<int> o;
-
-		title("push and top test");
-		for (int i = 0; i < 10; i++)
-		{
-			m.push(i);
-			std::cout << "m.top(): "<< m.top();
-			std::cout << std::endl;
-		}
-		std::cout << std::endl;
-
-		for (int i = 0; i < 10; i++)
-		{
-			o.push(i);
-			std::cout << o.top() << " ";
-		}
-		std::cout << std::endl;
-
-		title("size test");
-		std::cout << "m.size(): " << m.size() << std::endl;
-		std::cout << "o.size(): " << o.size() << std::endl;
-
-		title("pop test");
-		blue("m.top() after pop");
-		m.pop();
-		std::cout << "m.top(): " << m.top() << std::endl;
-
-		yellow("o.top() after pop");
-		o.pop();
-		std::cout << "o.top(): " << o.top() << std::endl;
-
+		//--------------------------------------------------------------------
+		highlight("Constructor : default");
+		cyannl("ft::stack<int> my");
+		ft::stack<int> my;
+		purplenl("std::stack<int> ori");
+		std::stack<int> ori;
+		//--------------------------------------------------------------------
+		highlight("Method : size");
+		cyannl("my.size()");
+		std::cout  << my.size() << "\n";
+		purplenl("ori.size()");
+		std::cout  << ori.size() << "\n";
+		//--------------------------------------------------------------------
+		highlight("Method : empty");
+		cyannl("my.empty()");
+		if (my.empty() == true)
+			std::cout << "empty" << "\n";
+		else
+			std::cout << "not empty" << "\n";
+		purplenl("ori.empty()");
+		if (ori.empty() == true)
+			std::cout << "empty" << "\n";
+		else
+			std::cout << "not empty" << "\n";
+		//--------------------------------------------------------------------
+		highlight("Method : push");
+		cyannl("for (int i = 1; i <= 42; ++i) { my.push(i); }");
+		for (int i = 1; i <= 42; ++i) { my.push(i); }
+		cyannl("my.top()");
+		std::cout << my.top() << "\n";
+		cyannl("my.size()");
+		std::cout  << my.size() << "\n";
+		purplenl("for (int i = 1; i <= 42; ++i) { ori.push(i); }");
+		for (int i = 1; i <= 42; ++i) { ori.push(i); }
+		purplenl("ori.top()");
+		std::cout << ori.top() << "\n";
+		purplenl("ori.size()");
+		std::cout  << ori.size() << "\n";
+		//--------------------------------------------------------------------
+		highlight("Method : pop");
+		cyannl("for (int i = 1; i <= 21; ++i) { my.pop(); }");
+		for (int i = 1; i <= 21; ++i) { my.pop(); }
+		cyannl("my.top()");
+		std::cout << my.top() << "\n";
+		cyannl("my.size()");
+		std::cout  << my.size() << "\n";
+		cyannl("for (int i = 1; i <= 21; ++i) { ori.pop(); }");
+		for (int i = 1; i <= 21; ++i) { ori.pop(); }
+		purplenl("ori.top()");
+		std::cout << ori.top() << "\n";
+		purplenl("ori.size()");
+		std::cout  << ori.size() << "\n";
+		//--------------------------------------------------------------------
+		highlight("Method : pop");
+		cyannl("for (int i = 1; i <= 21; ++i) { my.pop(); }");
+		for (int i = 1; i <= 21; ++i) { my.pop(); }
+		cyannl("my.size()");
+		std::cout  << my.size() << "\n";
+		cyannl("for (int i = 1; i <= 21; ++i) { ori.pop(); }");
+		for (int i = 1; i <= 21; ++i) { ori.pop(); }
+		purplenl("ori.size()");
+		std::cout  << ori.size() << "\n";
+		//--------------------------------------------------------------------
+		highlight("Method : empty");
+		cyannl("my.empty()");
+		if (my.empty() == true)
+			std::cout << "empty" << "\n";
+		else
+			std::cout << "not empty" << "\n";
+		purplenl("ori.empty()");
+		if (ori.empty() == true)
+			std::cout << "empty" << "\n";
+		else
+			std::cout << "not empty" << "\n";
 	}
 }
