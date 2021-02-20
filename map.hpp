@@ -6,7 +6,7 @@
 /*   By: lspiess <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/02/05 17:45:17 by lspiess           #+#    #+#             */
-/*   Updated: 2021/02/15 14:09:11 by lspiess          ###   ########.fr       */
+/*   Updated: 2021/02/20 17:38:21 by lspiess          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -542,7 +542,7 @@ namespace ft
 
 				if (parent != NULL)
 				{
-					if ( headside == 0)
+					if (headside == 0)
 					{
 						parent->left = _node_alloc.allocate(1);
 						_node_alloc.construct(parent->left, Node(substitute->elem,
@@ -775,20 +775,45 @@ namespace ft
 				_tree.remove(ft::make_pair(k, mapped_type()));
 			}
 
+
 			void erase(iterator first, iterator last)
 			{
+
+				Key curkey = (*first).first, nextkey, lastkey = (*last).first;
+//				std::cout << "lastkey = " << lastkey << "\n";
+
 				while (1)
 				{
-					iterator tmp(first); ++first; Key k = (*first).first;
-//					std::cout << "first.getNode() = " << first.getNode() << "\n";
-//					std::cout << "first.getInit() = " << first.getInit() << "\n";
-//					std::cout << "++Key = " <<  k << "\n";
-//					std::cout << "(*tmp).first = " << (*tmp).first << "\n";
-					erase((*tmp).first);
-					if (first == last) { break ; }
-					first = find(k);
+//					printMap(); std::cout << "\n";
+
+//					std::cout << "curkey = " << curkey << "\n";
+					++first;
+					nextkey = (*first).first;
+//					std::cout << "nextkey = " << nextkey << "\n";
+
+					erase(curkey);
+
+					first = find(nextkey); curkey = (*first).first;
+
+					if (curkey == lastkey) { break ; }
+
 				}
 			}
+
+//			void erase(iterator first, iterator last)
+//			{
+//				while (1)
+//				{
+//					iterator tmp(first); ++first; Key k = (*first).first;
+////					std::cout << "first.getNode() = " << first.getNode() << "\n";
+////					std::cout << "first.getInit() = " << first.getInit() << "\n";
+////					std::cout << "++Key = " <<  k << "\n";
+////					std::cout << "(*tmp).first = " << (*tmp).first << "\n";
+//					erase((*tmp).first);
+//					if (first == last) { break ; }
+//					first = find(k);
+//				}
+//			}
 
 			void swap(map & other)
 			{
@@ -834,129 +859,77 @@ namespace ft
 				if (itr != end()) { return (1); } else { return (0); }
 			}
 
+			iterator seek_lower_bound(const key_type k, Node * root)
+			{
+				key_compare comp;
+
+				if (root->elem.first == k) { return (iterator(&_tree, root)); }
+				if (comp(root->elem.first, k) == true) // if root key < k
+				{
+					if (root->right != NULL)
+						return (seek_lower_bound(k, root->right));
+				}
+				else
+				{
+					if (root->left != NULL)
+						return (seek_lower_bound(k, root->left));
+					else
+						return (iterator(&_tree, root));
+				}
+				return (end());
+			}
+
 			// return an iterator to the first element equal to or greater
 			// than key, or end()
 			iterator lower_bound(const key_type & k)
 			{
-				Node *head = _tree.getRoot(); key_compare comp;
-//				this->_tree.printTree();
-//				std::cout << "_tree.getRoot = " << head << ", "
-//							<< head->elem.first << ", " << head->elem.second << "\n";
-				while (head)
-				{
-//					std::cout << "_tree.getRoot = " << head << ", " << head->elem.first
-//						<< ", " << head->elem.second << "\n";
-					if (head->elem.first == k) { return (iterator(&_tree, head)); }
-					if (comp(head->elem.first, k) == true)
-					{
-//						std::cout << "going right\n";
-						head = head->right;
-					}
-					else if (head->left)
-					{
-//						std::cout << "going left\n";
-						head = head->left;
-						while (head->left) { head = head->left; }
-						return (iterator(&_tree, head));
-					}
-					else { break ; }
-				}
-				return (end());
+				Node *root = _tree.getRoot();
+				if (root == NULL)
+					return (end());
+				return (seek_lower_bound(k, root));
 			}
-			// same but const
+
 			const_iterator lower_bound(const key_type & k) const
 			{
-				Node *head = _tree.getRoot(); key_compare comp;
-//				this->_tree.printTree();
-//				std::cout << "_tree.getRoot = " << head << ", "
-//							<< head->elem.first << ", " << head->elem.second << "\n";
-				while (head)
-				{
-//					std::cout << "_tree.getRoot = " << head << ", " << head->elem.first
-//						<< ", " << head->elem.second << "\n";
-					if (head->elem.first == k) { return (const_iterator(&_tree, head)); }
-					if (comp(head->elem.first, k) == true)
-					{
-//						std::cout << "going right\n";
-						head = head->right;
-					}
-					else if (head->left)
-					{
-//						std::cout << "going left\n";
-						head = head->left;
-						while (head->left) { head = head->left; }
-						return (const_iterator(&_tree, head));
-					}
-					else { break ; }
-				}
-				return (const_iterator(end()));
+				Node *root = _tree.getRoot();
+				if (root == NULL)
+					return (const_iterator(end()));
+				return (const_iterator(seek_lower_bound(k, root)));
 			}
 
-			 // Returns an iterator to the first element whose key is strictly greater than k
+			iterator seek_upper_bound(const key_type k, Node * root)
+			{
+				key_compare comp;
+
+				if (root->elem.first == k || comp(root->elem.first, k) == true)
+				{
+					if (root->right != NULL)
+						return (seek_upper_bound(k, root->right));
+					else
+						return (end());
+				}
+				else
+				{
+					return (iterator(&_tree, root));
+				}
+			}
+
+			 // Returns an iterator to the first element whose key is
+			 // strictly greater than k
 			iterator upper_bound(const key_type & k)
 			{
-				Node *head = _tree.getRoot(); key_compare comp;
-
-				while (head)
-				{
-//					std::cout << "head = " << head << ", " << head->elem.first
-//						<< ", " << head->elem.second << "\n";
-					if (head->elem.first == k)
-					{
-//						std::cout << "Detected equality, going right\n";
-						head = head->right;
-					}
-					else if (comp(head->elem.first, k) == true) // if node key < k
-					{
-//						std::cout << "going right\n";
-						head = head->right;
-					}
-					else if (comp(k, head->elem.first) == true) // if node key >= k
-					{
-//						std::cout << "lala\n";
-						while (head->left)
-						{
-//							std::cout << "going left\n";
-							if (comp(k, head->left->elem.first) == true) // if node->left key > k
-								head = head->left;
-							else
-								break ;
-						}
-						return (iterator(&_tree, head));
-					}
-					else { break ; }
-				}
-				return (end());
+				Node *root = _tree.getRoot();
+				if (root == NULL)
+					return (end());
+				return (seek_upper_bound(k, root));
 			}
 
 			const_iterator upper_bound(const key_type & k) const
 			{
-				Node *head = _tree.getRoot(); key_compare comp;
-
-				while (head)
-				{
-					if (head->elem.first == k)
-					{
-						head = head->right;
-					}
-					else if (comp(head->elem.first, k) == true) // if node key < k
-					{
-						head = head->right;
-					}
-					else if (comp(k, head->elem.first) == true) // if node key >= k
-					{
-						while (head->left)
-						{
-							if (comp(k, head->left->elem.first) == true) // if node->left key > k
-								head = head->left;
-							else
-								break ;
-						}
-						return (const_iterator(&_tree, head));
-					}
-					else { break ; }
-				}
-				return (const_iterator(end()));
+				Node *root = _tree.getRoot();
+				if (root == NULL)
+					return (const_iterator(end()));
+				return (const_iterator(seek_upper_bound(k, root)));
 			}
 
 			// return a pair of iterator that possibly point to the subsequence
