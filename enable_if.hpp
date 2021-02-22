@@ -16,9 +16,7 @@ namespace ft {
 	// if the predicate B is true, the type T is defined (can compile)
 	template <typename T>
 	struct enable_if<true, T>
-	{
-		typedef T type;
-	};
+		{ typedef T type; };
 
 	/*
 	 * This is the predicate (and its specializations) used in place of 
@@ -38,34 +36,34 @@ namespace ft {
 	struct is_integral<char>
 		{ static const bool value = true; };
 	template <>
-	struct is_integral<wchar_t>
+	struct is_integral<unsigned char>
 		{ static const bool value = true; };
 	template <>
 	struct is_integral<signed char>
 		{ static const bool value = true; };
 	template <>
+	struct is_integral<wchar_t>
+		{ static const bool value = true; };
+	template <>
 	struct is_integral<short int>
-		{ static const bool value = true; };
-	template <>
-	struct is_integral<int>
-		{ static const bool value = true; };
-	template <>
-	struct is_integral<long int>
-		{ static const bool value = true; };
-	template <>
-	struct is_integral<long long int>
-		{ static const bool value = true; };
-	template <>
-	struct is_integral<unsigned char>
 		{ static const bool value = true; };
 	template <>
 	struct is_integral<unsigned short int>
 		{ static const bool value = true; };
 	template <>
+	struct is_integral<int>
+		{ static const bool value = true; };
+	template <>
 	struct is_integral<unsigned int>
 		{ static const bool value = true; };
 	template <>
+	struct is_integral<long int>
+		{ static const bool value = true; };
+	template <>
 	struct is_integral<unsigned long int>
+		{ static const bool value = true; };
+	template <>
+	struct is_integral<long long int>
 		{ static const bool value = true; };
 	template <>
 	struct is_integral<unsigned long long int>
@@ -77,9 +75,7 @@ namespace ft {
 
 	template <typename value_type>
 	bool less_than(value_type const &a, value_type const &b)
-	{
-		return (a < b);
-	}
+		{ return (a < b); }
 
 }; //namespace ft
 

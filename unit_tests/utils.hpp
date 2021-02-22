@@ -23,8 +23,6 @@ void purplenl(const std::string & s);
 
 bool less_than(int a, int b);
 
-bool uniqueness_sum_under10(int a, int b);
-
 bool predicate_true_over_12(int a);
 
 void highlight(const std::string & s);

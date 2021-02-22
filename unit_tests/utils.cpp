@@ -34,9 +34,6 @@ void whitenl(const std::string & s)
 bool less_than(int a, int b)
 { if (a < b) { return true; } else { return false; } }
 
-bool uniqueness_sum_under10(int a, int b)
-{ if (a + b < 10) { return true; } else { return false; } }
-
 bool predicate_true_over_12(int a)
 { if (a >= 15) { return true; } else { return false; } }
 

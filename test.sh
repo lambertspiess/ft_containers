@@ -23,6 +23,6 @@ do
 
 	declare -a CONTAINER_NAMES=( 'list' 'stack' 'queue' 'vector' 'map' )
 
-	make N=${CONTAINER_NAMES[($input - 1)]}
+	make C=${CONTAINER_NAMES[($input - 1)]}
 
 done
