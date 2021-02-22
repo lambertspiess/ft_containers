@@ -12,6 +12,7 @@ INCLUDES	+= vector.hpp
 INCLUDES	+= bst.hpp
 INCLUDES	+= stack.hpp
 INCLUDES	+= queue.hpp
+INCLUDES	+= my_nullptr.hpp
 
 NAME		= $C
 

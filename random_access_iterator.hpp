@@ -1,6 +1,7 @@
 #ifndef RANDOM_ACCESS_ITERATOR_HPP
 # define RANDOM_ACCESS_ITERATOR_HPP
 # include <cstddef>
+# include "my_nullptr.hpp"
 # include "iterators.hpp"
 
 namespace ft
@@ -20,7 +21,7 @@ namespace ft
 
 		public:
 			random_access_iterator(void)
-			: _elem(nullptr) {}
+			: _elem(my_nullptr) {}
 
 			random_access_iterator(pointer elem)
 			: _elem(elem) {}

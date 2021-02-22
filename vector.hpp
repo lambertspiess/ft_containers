@@ -3,6 +3,7 @@
 
 # include <memory>
 # include <cstddef>
+# include "my_nullptr.hpp"
 # include "iterators.hpp"
 # include "random_access_iterator.hpp"
 # include "enable_if.hpp"
@@ -38,12 +39,12 @@ namespace ft
 
 		public:
 			explicit vector(const allocator_type & alloc = allocator_type())
-			: _alloc(alloc), _start(nullptr), _end(nullptr), _memend(nullptr)
+			: _alloc(alloc), _start(my_nullptr), _end(my_nullptr), _memend(my_nullptr)
 			{}
 
 			explicit vector(size_type n, const value_type & val = value_type(),
 							const allocator_type & alloc = allocator_type())
-			: _alloc(alloc), _start(nullptr), _end(nullptr), _memend(nullptr)
+			: _alloc(alloc), _start(my_nullptr), _end(my_nullptr), _memend(my_nullptr)
 			{
 				_start = _alloc.allocate(n); _memend = _start + n;
 				_end = _start;
@@ -56,8 +57,8 @@ namespace ft
 					const allocator_type & alloc = allocator_type(),
 					typename ft::enable_if<
 									!ft::is_integral<InputIterator>::value, InputIterator
-								>::type * = nullptr)
-			: _alloc(alloc), _start(nullptr), _end(nullptr), _memend(nullptr)
+								>::type * = my_nullptr)
+			: _alloc(alloc), _start(my_nullptr), _end(my_nullptr), _memend(my_nullptr)
 			{
 				difference_type n = ft::distance(first, last);
 				_start = _alloc.allocate(n); _memend = _start + n;
@@ -67,14 +68,14 @@ namespace ft
 			}
 
 			vector (const vector & other)
-			: _alloc(other._alloc), _start(nullptr), _end(nullptr), _memend(nullptr)
+			: _alloc(other._alloc), _start(my_nullptr), _end(my_nullptr), _memend(my_nullptr)
 			{
 				insert(begin(), other.begin(), other.end());
 			}
 
 			~vector()
 			{
-				if (_start != nullptr)
+				if (_start != my_nullptr)
 				{
 					size_type nbytes = size();
 					clear(); // destroy
@@ -169,7 +170,7 @@ namespace ft
 			void assign(InputIterator first, InputIterator last,
 						typename ft::enable_if<
 								!ft::is_integral<InputIterator>::value, InputIterator
-											>::type * = nullptr)
+											>::type * = my_nullptr)
 			{
 				clear();
 				int i = 0;
@@ -224,7 +225,7 @@ namespace ft
 			void insert(iterator position, InputIterator first, InputIterator last,
 						typename ft::enable_if<
 									!ft::is_integral<InputIterator>::value, InputIterator
-								>::type * = nullptr)
+								>::type * = my_nullptr)
 			{
 				size_type n = distance(first, last);
 				size_type newsize = size() + n;

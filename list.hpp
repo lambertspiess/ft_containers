@@ -3,6 +3,7 @@
 
 # include <string>
 # include <iostream>
+# include "my_nullptr.hpp"
 # include "iterators.hpp"
 # include "enable_if.hpp"
 # include <memory>
@@ -16,9 +17,9 @@ namespace ft
 		list_node<T> *prev, *next; T elem;
 
 		list_node()
-			: prev(nullptr), next(nullptr) {}
+			: prev(my_nullptr), next(my_nullptr) {}
 		list_node(const T & elem) :
-			prev(nullptr), next(nullptr), elem(elem) {}
+			prev(my_nullptr), next(my_nullptr), elem(elem) {}
 		list_node(list_node<T> *prev, list_node<T> *next, const T & elem)
 			: prev(prev), next(next), elem(elem) {}
 		list_node(list_node<T> *node)
@@ -45,7 +46,7 @@ namespace ft
 		typedef const T *										pointer;
 		typedef const T &										reference;
 
-		list_iterator() : node(nullptr) {}
+		list_iterator() : node(my_nullptr) {}
 		list_iterator(list_node<T> * srcnode) : node(srcnode) {}
 		list_iterator(const self & other) : node(other.node) {}
 		virtual ~list_iterator() {}
@@ -133,8 +134,8 @@ namespace ft
 			_node_allocator									_node_alloc;
 			typedef typename _node_allocator::pointer		node_pointer;
 
-			node_pointer _allocateNode(const T & elem, node * prev = nullptr,
-														node * next = nullptr)
+			node_pointer _allocateNode(const T & elem, node * prev = my_nullptr,
+														node * next = my_nullptr)
 			{
 				node * newnode = _node_alloc.allocate(1);
 				_node_alloc.construct(newnode, node(elem));
@@ -180,7 +181,7 @@ namespace ft
 			list(InputIterator first, InputIterator last,
 				const allocator_type & a = allocator_type(),
 				typename ft::enable_if<!ft::is_integral<InputIterator>::value,
-							InputIterator>::type * = nullptr)
+							InputIterator>::type * = my_nullptr)
 			: _alloc(a)
 			{
 				_last = _node_alloc.allocate(1);
@@ -243,7 +244,7 @@ namespace ft
 				typename ft::enable_if<
 								!is_integral<InputIterator>::value,
 								InputIterator
-									>::type * = nullptr)
+									>::type * = my_nullptr)
 				{
 					insert(end(), first, last);
 				}
@@ -280,7 +281,7 @@ namespace ft
 			template <typename InputIterator>
 			void insert(iterator position, InputIterator first, InputIterator last,
 						typename ft::enable_if<!is_integral<InputIterator>::value,
-									InputIterator>::type * = nullptr)
+									InputIterator>::type * = my_nullptr)
 			{
 				InputIterator itr = first;
 				while (itr != last)
