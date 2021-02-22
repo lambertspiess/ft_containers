@@ -129,6 +129,7 @@ namespace ft
 			typedef ptrdiff_t								difference_type;
 		protected:
 			typedef list_node<T>							node;
+			// see GNU libstdc++-v3/include/bits/forward_list.h
 			typedef typename Alloc::template rebind<list_node<T> >::other
 															_node_allocator;
 			_node_allocator									_node_alloc;
@@ -229,8 +230,9 @@ namespace ft
 				return (n);
 			}
 
+			// see GNU libstdc++-v3/include/bits/forward_list.h
 			size_type max_size() const
-			{ return (static_cast<size_type>(SIZE_MAX / sizeof(list_node<T>))); }
+			{ return (_node_allocator().max_size()); }
 
 			// Element access
 			reference front() { return (_last->next->elem); }

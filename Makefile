@@ -22,4 +22,4 @@ $(NAME):
 		@$(CC) $(CFLAGS) $(SRCS) -o $(NAME)
 		@./$C
 		@rm $C
-		@rm *.o || true
+		@rm -f *.o || true
