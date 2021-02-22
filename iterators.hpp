@@ -145,8 +145,6 @@ namespace ft
 						typename iterator_traits<Iterator>::pointer,
 						typename iterator_traits<Iterator>::reference>
 	{
-//		template<typename Iter>
-//		friend class reverse_iterator;
 		protected:
 			Iterator										current;
 			typedef iterator_traits<Iterator>				traits_type;
