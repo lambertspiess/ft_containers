@@ -35,9 +35,9 @@ namespace ft
 	template <typename T>
 	struct list_iterator: public ft::iterator<ft::bidirectional_iterator_tag, T>
 	{
-		typedef list_iterator									self;
 		list_node<T>											*node;
 
+		typedef list_iterator									self;
 		typedef ft::iterator<ft::bidirectional_iterator_tag, T>	_it;
 		typedef typename _it::difference_type					difference_type;
 		typedef typename _it::iterator_category					iterator_category;
@@ -73,9 +73,9 @@ namespace ft
 	struct list_const_iterator
 					: public ft::iterator<ft::bidirectional_iterator_tag, T>
 	{
-		typedef list_const_iterator							self;
 		const list_node<T>									*node;
 
+		typedef list_const_iterator							self;
 		typedef ft::iterator<ft::bidirectional_iterator_tag, T>	_it;
 		typedef typename _it::difference_type				difference_type;
 		typedef typename _it::iterator_category				iterator_category;
@@ -109,6 +109,9 @@ namespace ft
 	template <typename T, typename Alloc = std::allocator<T> >
 	class list
 	{
+		private:
+			list_node<T>									*_last;
+			Alloc											_alloc;
 		public:
 			typedef T										value_type;
 			typedef Alloc									allocator_type;;
@@ -130,11 +133,6 @@ namespace ft
 			_node_allocator									_node_alloc;
 			typedef typename _node_allocator::pointer		node_pointer;
 
-		private:
-			node											*_last;
-			allocator_type									_alloc;
-
-// see : https://stackoverflow.com/questions/5628059/c-stl-allocator-vs-operator-new
 			node_pointer _allocateNode(const T & elem, node * prev = nullptr,
 														node * next = nullptr)
 			{
