@@ -108,46 +108,32 @@ namespace ft
 			{
 				Node *root = this->_tree->getRoot();
 
-//				std::cout << "\tsfsg 1\n";
-
 				 // if tree is empty, iterator will point to the init node
 				if (root == NULL)
 				{
 					this->_node = this->_tree->getInit();
-//					std::cout << "this->_node = this->_tree->getInit() = " << this->_node << "\n";
 					return (*this);
 				}
-
-//				std::cout << "\tsfsg 2\n";
 
 				// if _node is NULL or out of bounds, go to the smallest node
 				if (this->_node == NULL || this->_node == this->_tree->getInit())
 				{
 					this->_node = root;
-//					std::cout << "\tthis->_node = root = " << this->_node << "\n";
 					while (this->_node->left)
 					{ 
-//						std::cout << "\tthis->_node->left = " << this->_node->left << "\n";
 						this->_node = this->_node->left;
 					}
 					return (*this);
 				}
 
-//				std::cout << "\tsfsg 3\n";
-
 				// if there is a subtree on the right...
 				if (this->_node->right != NULL)
 				{
 					// iterator will point to the smallest value in that subtree
-//					std::cout << "\tthis->_node->right = " << this->_node->right << "\n";
 					this->_node = this->_node->right;
-//					std::cout << "\tthis->_node->left = " << this->_node->left << "\n";
 					while (this->_node->left) { this->_node = this->_node->left; }
-//					std::cout << "returning this->_node = " << this->_node << "\n";
 					return (*this);
 				}
-
-//				std::cout << "\tsfsg 4\n";
 
 				// this->node is the rightmost node of its branch. Gotta look
 				// for a bigger parent.
@@ -160,12 +146,8 @@ namespace ft
 						break ;
 				}
 
-//				std::cout << "\tsfsg 5\n";
-
 				// then go to that parent's parent
 				this->_node = this->_node->parent;
-
-//				std::cout << "\tsfsg 6\n";
 
 				// if we haven't found a bigger parent, return init
 				if (this->_node == NULL) { this->_node = this->_tree->getInit(); }
@@ -439,20 +421,13 @@ namespace ft
 
 			bool remove(const value_type & val)
 			{
-//				std::cout << "===============================\n";
-//				printTree();
-//				std::cout << "===============================\n";
 				bool ret = remove(_root, val);
 //				return (remove(_root, val));
-//				std::cout << "===============================\n";
-//				printTree();
-//				std::cout << "===============================\n";
 				return (ret);
 			}
 
 			bool remove(Node * root, const value_type & val)
 			{
-//				std::cout << "-----\nIn remove, target = " << val.first << "\n";
 				if (root == NULL) { return (false); } Node * head = root;
 				// go through the tree and find the matching key
 				while (head)
@@ -464,20 +439,12 @@ namespace ft
 					else
 						head = head->right;
 				}
-//				if (head == NULL) { std::cout << "\tHead == NULL, returning\n" << "\n"; }
-//				else {
-//					std::cout << "\tHead arrived to : " << head << ", "<< head->elem.first
-//						<< ", " << head->elem.second << "\n";
-//				}
 
 				// if no node with a matching key was not found, return
 				if (head == NULL) { return (false); }
 				// save some info needed to rearrange the tree...
 				Node *leftchild = head->left, *rightchild = head->right;
-//				std::cout << "leftchild = " << leftchild << ", rightchild = " << rightchild
-//					<< "\n";
 				Node *parent = head->parent;
-//				std::cout << "parent = " << parent << "\n";
 				bool headside = 0; // the node's position relative to its parent
 
 				if (parent)
@@ -489,31 +456,20 @@ namespace ft
 				}
 
 				// deleting the node
-//				std::cout << "\tdeallocating " << head << "\n";
 				_node_alloc.destroy(head); _node_alloc.deallocate(head, 1); head = NULL;
-//				std::cout << "\tdeallocated, headside = " << headside << "\n";
 
 				// if the deleted node was not a leaf, rearrange the tree :
 				Node * substitute; bool subtreeside;
 				if (leftchild)
 				{
-//					std::cout << "\t\tfinding max in leftchild...";
 					substitute = find_max(leftchild); subtreeside = 0;
-//					std::cout << " substitute = " << substitute->elem.first
-//						<< ", " << substitute->elem.second << "\n";
 				}
 				else if (rightchild)
 				{
-//					std::cout << "\t\tfinding min in rightchild...";
 					substitute = find_min(rightchild); subtreeside = 1;
-//					std::cout << " substitute = " << substitute->elem.first
-//						<< ", " << substitute->elem.second << "\n";
 				}
 				else // no subtrees means we removed a leaf node
 				{
-//					std::cout << "\tjust deleted a leaf, returning...\n";
-//					std::cout << "\tparent = " << parent << "\n";
-//					std::cout << "\thead = " << head << "\n";
 					if (parent != NULL) // if leaf had a parent, it wasn't _root
 					{
 						if (headside == 0)
@@ -556,10 +512,6 @@ namespace ft
 				if (leftchild) { leftchild->parent = head; }
 				if (rightchild) { rightchild->parent = head; }
 
-//				std::cout << "Substituted the deleted node. Printing :\n";
-//				printTree();
-//				std::cout << "Removing the double...\n";
-
 				// now that we have copied the substitute in the deleted
 				// node's place, we remove the original down in the subtree
 				if (subtreeside == 0)
@@ -584,14 +536,12 @@ namespace ft
 
 			size_type getTreeSize(Node *node) const
 			{
-//				std::cout << "SFSG getTreeSize()\n";
 				if (node == NULL) { return (0); }
 				return (1 + getTreeSize(node->left) + getTreeSize(node->right));
 			}
 
 			size_type getSize() const
 			{
-//				std::cout << "SFSG getsize()\n";
 				Node * node = _root;
 				return (getTreeSize(node));
 			}
@@ -700,15 +650,9 @@ namespace ft
 
 			iterator begin()
 			{
-//				std::cout << "sfsg1\n";
 				Node *head = _tree.getRoot();
-//				std::cout << "sfsg2\n";
 				if (!head) { return (iterator(&_tree, _tree.getInit())); }
-//				std::cout << "sfsg3\n";
-//				std::cout << "head= " << head << "\n";
-//				std::cout << "head->left = " << head->left << "\n";
 				while (head->left) { head = head->left; }
-//				std::cout << "sfsg4\n";
 				return (iterator(&_tree, head));
 			}
 
@@ -729,7 +673,6 @@ namespace ft
 
 			size_type size() const
 			{
-//				std::cout << "sfsg size()\n";
 				return (_tree.getSize());
 			}
 
@@ -759,49 +702,23 @@ namespace ft
 
 			void erase(const Key & k)
 			{
-//				std::cout << "\tcallling erase on key : " << k << "\n";
 				_tree.remove(ft::make_pair(k, mapped_type()));
 			}
 
 
 			void erase(iterator first, iterator last)
 			{
-
 				Key curkey = (*first).first, nextkey, lastkey = (*last).first;
-//				std::cout << "lastkey = " << lastkey << "\n";
 
 				while (1)
 				{
-//					printMap(); std::cout << "\n";
-
-//					std::cout << "curkey = " << curkey << "\n";
 					++first;
 					nextkey = (*first).first;
-//					std::cout << "nextkey = " << nextkey << "\n";
-
 					erase(curkey);
-
 					first = find(nextkey); curkey = (*first).first;
-
 					if (curkey == lastkey) { break ; }
-
 				}
 			}
-
-//			void erase(iterator first, iterator last)
-//			{
-//				while (1)
-//				{
-//					iterator tmp(first); ++first; Key k = (*first).first;
-////					std::cout << "first.getNode() = " << first.getNode() << "\n";
-////					std::cout << "first.getInit() = " << first.getInit() << "\n";
-////					std::cout << "++Key = " <<  k << "\n";
-////					std::cout << "(*tmp).first = " << (*tmp).first << "\n";
-//					erase((*tmp).first);
-//					if (first == last) { break ; }
-//					first = find(k);
-//				}
-//			}
 
 			void swap(map & other)
 			{
@@ -932,9 +849,7 @@ namespace ft
 
 			void printMap() const
 			{
-				std::cout << "-------------------------\n";
 				_tree.printTree(); 
-				std::cout << "-------------------------\n";
 			}
 
 	}; // class map

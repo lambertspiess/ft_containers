@@ -95,7 +95,6 @@ namespace ft
 
 			iterator end()
 			{
-//				std::cout << "In end(), _end = " << _end << "\n";
 				return (_end);
 			}
 
@@ -130,13 +129,6 @@ namespace ft
 					}
 					_alloc.deallocate(old_start, old_cap);
 				}
-//				std::cout << "AFTER RESERVE" << "\n";
-//				pointer ptr = _start;
-//				while (ptr != _end)
-//				{
-//					std::cout << *ptr << ", "; ptr++;
-//				}
-//				std::cout << "\n";
 			}
 
 			void resize(size_type n, value_type val = value_type())
